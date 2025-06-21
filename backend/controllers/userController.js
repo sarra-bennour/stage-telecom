@@ -20,6 +20,8 @@ exports.signup = async (req, res) => {
       tel
     });
 
+    console.log("user******: ",user)
+
     res.status(201).json({
       status: 'success',
       data: {
@@ -49,10 +51,17 @@ exports.login = (req, res, next) => {
         message: info.message
       });
     }
-    
-    req.logIn(user, (err) => {
+
+    req.login(user, (err) => {
       if (err) return next(err);
       
+      // Si "Remember Me" est coché, prolongez la session
+      if (req.body.rememberMe) {
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 jours
+      } else {
+        req.session.cookie.expires = false; // Session du navigateur seulement
+      }
+
       return res.status(200).json({
         status: 'success',
         data: {
@@ -68,37 +77,37 @@ exports.login = (req, res, next) => {
   })(req, res, next);
 };
 
-exports.logout = (req, res, next) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    // Destruction de la session
+
+
+exports.logout = (req, res) => {
+  req.logout(() => {
     req.session.destroy((err) => {
       if (err) {
         console.error('Erreur lors de la destruction de la session:', err);
         return res.status(500).json({ status: 'error', message: 'Échec de la déconnexion' });
       }
-      // Effacer le cookie côté client
-      res.clearCookie('connect.sid');
+      res.clearCookie('connect.sid', {
+        path: '/',
+        domain: process.env.NODE_ENV === 'production' ? 'votredomaine.com' : 'localhost'
+      });
       res.status(200).json({ status: 'success', message: 'Déconnexion réussie' });
     });
   });
 };
 
+
 exports.checkAuth = (req, res) => {
   if (req.isAuthenticated()) {
-    return res.status(200).json({
+    return res.status(200).json({ 
       status: 'success',
       data: {
-        user: {
-          id: req.user._id,
-          nom: req.user.nom,
-          email: req.user.email,
-          role: req.user.role
-        }
+        user: req.user // Renvoie directement l'utilisateur de la session
       }
     });
   }
-  res.status(401).json({ status: 'fail', message: 'Non authentifié' });
+  
+  res.status(401).json({ 
+    status: 'fail', 
+    message: 'Non authentifié'
+  });
 };

@@ -9,7 +9,7 @@ const mongo = require('mongoose');
 const http = require('http');
 const bodyparser = require('body-parser');
 //const transporter = require('./utils/emailConfig'); // Import the transporter from middleware
-//const MongoStore = require('connect-mongo');
+const MongoStore = require('connect-mongo');
 const User = require('./models/User')
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
@@ -27,21 +27,36 @@ mongo
     console.log(err);
   });
 
-const usersRouter = require('./routes/userRoute');
 
 
 const app = express();
 const server = http.createServer(app);
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Frontend URL
-  credentials: true, // Allow cookies to be sent/received
+  origin: 'http://localhost:5173',
+  credentials: true, // Autorise les credentials
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// View engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'twig');
-
+// Configuration de la session
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      ttl: 30 * 24 * 60 * 60 //session expire apres 30 jours
+    }),
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24,
+      sameSite: 'lax',
+    },
+  })
+);
 
 
 // Middleware
@@ -52,33 +67,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Session configuration
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET, // Use a secure secret key
-//     resave: false,
-//     saveUninitialized: true,
-//     store: MongoStore.create({
-//       mongoUrl: db.url, // MongoDB connection URL
-//       ttl: 24 * 60 * 60, // Session TTL (1 day)
-//     }),
-//     cookie: {
-//       secure: false, // Set to true if using HTTPS
-//       httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
-//       maxAge: 1000 * 60 * 60 * 24, // 1 day
-//       sameSite: 'lax', // Prevent CSRF attacks
-//     },
-//   })
-// );
 
-
-// Configuration des sessions
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 1 jour
-}));
 
 // Initialisation de Passport
 app.use(passport.initialize());
@@ -109,7 +98,10 @@ passport.serializeUser((user, done) => {
 // Désérialisation de l'utilisateur
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).select('-password'); // Exclure le mot de passe
+    if (!user) {
+      return done(new Error('Utilisateur non trouvé'));
+    }
     done(null, user);
   } catch (err) {
     done(err);
@@ -117,8 +109,31 @@ passport.deserializeUser(async (id, done) => {
 });
 
 
-// // Routes
- app.use('/users', usersRouter);
+// Routes
+const usersRouter = require('./routes/userRoute');
+app.use('/users', usersRouter);
+
+// Middleware de vérification d'authentification
+const requireAuth = (req, res, next) => {
+  console.log('Session verification:', {
+    sessionID: req.sessionID,
+    authenticated: req.isAuthenticated(),
+    user: req.user
+  });
+  
+  if (req.isAuthenticated()) return next();
+  
+  console.warn('Unauthorized access attempt', {
+    headers: req.headers,
+    cookies: req.cookies
+  });
+  
+  res.status(401).json({ 
+    status: 'fail', 
+    message: 'Non authentifié',
+    session: req.session 
+  });
+};
 
 // Error handling
 app.use((req, res, next) => {
