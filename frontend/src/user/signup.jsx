@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
@@ -8,11 +8,12 @@ const Signup = () => {
     email: '',
     password: '',
     tel: '',
-    role: 'technicien' // Valeur par défaut
+    role: 'technicien'
   });
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -22,6 +23,26 @@ const Signup = () => {
       [name]: value
     }));
   };
+
+  useEffect(() => {
+    // Déclarer la fonction de callback globale
+    window.handleRecaptchaChange = (token) => {
+      setRecaptchaToken(token);
+    };
+
+    // Charger le script reCAPTCHA (sans le paramètre render dans l'URL)
+    const script = document.createElement('script');
+    script.src = 'https://www.google.com/recaptcha/api.js';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    return () => {
+      // Nettoyage
+      document.body.removeChild(script);
+      delete window.handleRecaptchaChange;
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,13 +55,22 @@ const Signup = () => {
       return;
     }
 
+    if (!recaptchaToken) {
+      setError('Veuillez vérifier que vous n\'êtes pas un robot');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:3000/users/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          recaptchaToken // Ajouter le token reCAPTCHA
+        }),
       });
 
       const data = await response.json();
@@ -49,7 +79,6 @@ const Signup = () => {
         throw new Error(data.message || 'Échec de l\'inscription');
       }
 
-      // Redirection vers la page de login après inscription réussie
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -57,6 +86,7 @@ const Signup = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <>
@@ -82,7 +112,7 @@ const Signup = () => {
                   </div>
                   <div className="flex-auto p-6">
                     {error && (
-                      <div className="mb-4 p-3 text-white bg-red-500 rounded-lg text-sm">
+                      <div className="mb-4 p-3 text-red-500 bg-red-500 rounded-lg text-sm">
                         {error}
                       </div>
                     )}
@@ -158,6 +188,15 @@ const Signup = () => {
                           I agree the <a href="javascript:;" className="font-bold text-slate-700">Terms and Conditions</a>
                         </label>
                       </div>
+
+                      <div className="mb-4">
+                        <div
+                          className="g-recaptcha"
+                          data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                          data-callback="handleRecaptchaChange"
+                        ></div>
+                      </div>
+
                       <div className="text-center">
                         <button 
                           type="submit" 

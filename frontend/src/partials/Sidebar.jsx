@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 const Sidebar = () =>{
     return(
         <>
@@ -15,35 +17,53 @@ const Sidebar = () =>{
   <div className="items-center block w-auto max-h-screen overflow-auto h-sidenav grow basis-full">
     <ul className="flex flex-col pl-0 mb-0">
       <li className="mt-0.5 w-full">
-        <a className="py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors" href="./pages/dashboard.html">
-          <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-            <i className="relative top-0 text-sm leading-normal text-blue-500 ni ni-tv-2" />
-          </div>
-          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Dashboard</span>
-        </a>
+        <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg ${
+                isActive
+                  ? 'bg-blue-500/20 bg-blue-500/13 text-blue-700 font-semibold'
+                  : 'text-slate-700 dark:text-white dark:opacity-80'
+              }`
+            }
+          >
+            <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg text-center xl:p-2.5">
+              <i className="ni ni-tv-2 relative top-0 text-sm leading-normal text-blue-500" />
+            </div>
+            <span className="ml-1 duration-300 opacity-100 ease">Dashboard</span>
+          </NavLink>
       </li>
       <li className="mt-0.5 w-full">
-        <a className=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors" href="./pages/tables.html">
-          <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-            <i className="relative top-0 text-sm leading-normal text-orange-500 ni ni-calendar-grid-58" />
-          </div>
-          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Tables</span>
-        </a>
+        <NavLink
+            to="/station-list"
+            className={({ isActive }) =>
+              `py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg ${
+                isActive
+                  ? 'bg-blue-500/20 bg-blue-500/13 text-orange-600 font-semibold'
+                  : 'text-slate-700 dark:text-white dark:opacity-80'
+              }`
+            }
+          >
+            <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg text-center xl:p-2.5">
+              <i className="las la-broadcast-tower relative top-0 text-xl leading-normal text-orange-500"></i>
+            </div>
+            <span className="ml-1 duration-300 opacity-100 ease">Stations de Base</span>
+          </NavLink>
       </li>
       <li className="mt-0.5 w-full">
         <a className=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors" href="./pages/billing.html">
           <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center fill-current stroke-0 text-center xl:p-2.5">
-            <i className="relative top-0 text-sm leading-normal text-emerald-500 ni ni-credit-card" />
+            <i class="las la-wifi relative top-0 text-xl leading-normal text-emerald-500"></i>
           </div>
-          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Billing</span>
+          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Antennes</span>
         </a>
       </li>
       <li className="mt-0.5 w-full">
         <a className=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors" href="./pages/virtual-reality.html">
           <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-            <i className="relative top-0 text-sm leading-normal text-cyan-500 ni ni-app" />
+            <i class="relative top-0 text-xl leading-normal text-cyan-500 las la-signal"></i>
           </div>
-          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Virtual Reality</span>
+          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Transmissions</span>
         </a>
       </li>
       <li className="mt-0.5 w-full">
@@ -51,7 +71,7 @@ const Sidebar = () =>{
           <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
             <i className="relative top-0 text-sm leading-normal text-red-600 ni ni-world-2" />
           </div>
-          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">RTL</span>
+          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Dérangement</span>
         </a>
       </li>
       <li className="w-full mt-4">

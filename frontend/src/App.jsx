@@ -4,7 +4,8 @@ import Layout from './partials/Layout';
 import Dashboard from './partials/Dashboard';
 import Login from './user/login';
 import Signup from './user/signup';
-import ProtectedRoute from './partials/ProtectedRoute'; // Importez le composant
+import ProtectedRoute from './partials/ProtectedRoute';
+import StationList from './station/stationList';
 
 function App() {
   return (
@@ -16,6 +17,11 @@ function App() {
           <Route path='/dashboard' element={
             <ProtectedRoute>
               <Dashboard/>
+            </ProtectedRoute>
+          } />
+          <Route path='/station-list' element={
+            <ProtectedRoute>
+              <StationList/>
             </ProtectedRoute>
           } />
         </Route>

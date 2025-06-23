@@ -13,8 +13,8 @@ const Navbar = () =>{
         
         if (response.ok) {
             console.log('logout success')
-            localStorage.removeItem('user'); // Supprime les données utilisateur
-            navigate('/'); // Redirige vers la page de login
+            localStorage.removeItem('user'); 
+            navigate('/');
         } else {
             console.error('Logout failed');
         }

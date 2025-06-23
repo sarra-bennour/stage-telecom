@@ -1,14 +1,33 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
+const axios = require('axios');
 const LocalStrategy = require('passport-local').Strategy;
 
 
 exports.signup = async (req, res) => {
   try {
-    const { nom, prenom, email, password, role, tel } = req.body;
-    
-    // Hashage du mot de passe avant création
+    const { nom, prenom, email, password, role, tel, recaptchaToken } = req.body;
+
+    // 1. Vérifier reCAPTCHA
+    const recaptchaResponse = await axios.post(
+      'https://www.google.com/recaptcha/api/siteverify',
+      null,
+      {
+        params: {
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: recaptchaToken,
+        },
+      }
+    );
+
+    if (!recaptchaResponse.data.success) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Échec de la vérification reCAPTCHA',
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await User.create({
@@ -19,8 +38,6 @@ exports.signup = async (req, res) => {
       role,
       tel
     });
-
-    console.log("user******: ",user)
 
     res.status(201).json({
       status: 'success',
@@ -42,40 +59,67 @@ exports.signup = async (req, res) => {
 };
 
 
-exports.login = (req, res, next) => {
+
+
+exports.login = async (req, res, next) => {
+  const { email, password, rememberMe, recaptchaToken } = req.body;
+
+  try {
+    const response = await axios.post(
+      'https://www.google.com/recaptcha/api/siteverify',
+      null,
+      {
+        params: {
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: recaptchaToken,
+        },
+      }
+    );
+
+    if (!response.data.success) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Échec de la vérification reCAPTCHA',
+      });
+    }
+  } catch (err) {
+    return next(err);
+  }
+
+  // Authentification normale
   passport.authenticate('local', (err, user, info) => {
     if (err) return next(err);
     if (!user) {
       return res.status(401).json({
         status: 'fail',
-        message: info.message
+        message: info.message,
       });
     }
 
     req.login(user, (err) => {
       if (err) return next(err);
       
-      // Si "Remember Me" est coché, prolongez la session
-      if (req.body.rememberMe) {
+      if (rememberMe) {
         req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 jours
       } else {
-        req.session.cookie.expires = false; // Session du navigateur seulement
+        req.session.cookie.expires = false;
       }
 
-      return res.status(200).json({
+      res.status(200).json({
         status: 'success',
         data: {
           user: {
             id: user._id,
             nom: user.nom,
             email: user.email,
-            role: user.role
-          }
-        }
+            role: user.role,
+          },
+        },
       });
     });
   })(req, res, next);
 };
+
 
 
 

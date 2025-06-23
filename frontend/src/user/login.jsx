@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -7,54 +7,69 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState('');
   const navigate = useNavigate();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
+  useEffect(() => {
+    // Déclarer la fonction dans la portée globale
+    window.handleRecaptchaChange = (token) => {
+      setRecaptchaToken(token);
+    };
 
-  try {
-    const response = await fetch('http://localhost:3000/users/login', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password, rememberMe }),
-    });
+    const loadRecaptcha = () => {
+      const script = document.createElement('script');
+      script.src = 'https://www.google.com/recaptcha/api.js';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    };
 
-    const data = await response.json();
+    loadRecaptcha();
 
-    if (!response.ok) {
-      console.log('❌ Login failed:', data.message);
-      throw new Error(data.message || 'Login failed');
+    // Nettoyage
+    return () => {
+      delete window.handleRecaptchaChange;
+    };
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    if (!recaptchaToken) {
+      setError('Veuillez vérifier que vous n\'êtes pas un robot');
+      setLoading(false);
+      return;
     }
 
-    console.log('✅ Login successful! User:', data.data.user);
-    
-    // Vérification immédiate de l'authentification
-    const authCheck = await fetch('http://localhost:3000/users/check-auth', {
-      method: 'GET',
-      credentials: 'include'
-    });
-    
-    const authData = await authCheck.json();
-    console.log('🔍 Auth check result:', authData);
+    try {
+      const response = await fetch('http://localhost:3000/users/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, rememberMe, recaptchaToken }),
+      });
 
-    if (data.data?.user) {
-      localStorage.setItem('user', JSON.stringify(data.data.user));
-      navigate('/dashboard');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      if (data.data?.user) {
+        localStorage.setItem('user', JSON.stringify(data.data.user));
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.message || 'Login error');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    
-  } catch (err) {
-    console.log('⚠️ Error:', err.message);
-    setError(err.message || 'Login error');
-  } finally {
-    setLoading(false);
-  }
-};
 
   return (
     <>
@@ -123,7 +138,7 @@ const handleSubmit = async (e) => {
                       </div>
                       <div className="flex-auto p-6">
                         {error && (
-                          <div className="mb-4 p-3 text-white bg-red-500 rounded-lg text-sm">
+                          <div className="mb-4 p-3 text-red-500 bg-red-500 rounded-lg text-sm">
                             {error}
                           </div>
                         )}
@@ -160,6 +175,15 @@ const handleSubmit = async (e) => {
                               Remember me
                             </label>
                           </div>
+
+                          <div className="mb-4">
+                            <div
+                              className="g-recaptcha"
+                              data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                              data-callback="handleRecaptchaChange">
+                            </div>
+                          </div>
+
                           <div className="text-center">
                             <button 
                               type="submit" 
@@ -174,9 +198,9 @@ const handleSubmit = async (e) => {
                       <div className="border-black/12.5 rounded-b-2xl border-t-0 border-solid p-6 text-center pt-0 px-1 sm:px-6">
                         <p className="mx-auto mb-6 leading-normal text-sm">
                           Don't have an account?{' '}
-                          <a href="../pages/sign-up.html" className="font-semibold text-transparent bg-clip-text bg-gradient-to-tl from-blue-500 to-violet-500">
+                          <Link to="/signup" className="font-semibold text-transparent bg-clip-text bg-gradient-to-tl from-blue-500 to-violet-500">
                             Sign up
-                          </a>
+                          </Link>
                         </p>
                       </div>
                     </div>
