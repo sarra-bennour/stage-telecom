@@ -544,56 +544,110 @@ const StationList = () => {
             </div>
           </div>
         </div>
-
-        {/* Cards Grid - FIXED LAYOUT */}
-        <div className="mt-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentCards.map((card) => (
+{/* Cards Grid - FIXED LAYOUT */}
+<div className="mt-4 mb-4">
+  <div className="bg-white p-3 rounded-xl border border-gray-100">
+    <div className="flex flex-wrap gap-x-7 gap-y-6 justify-start w-full" style={{ gap: '28px 24px' }}>
+      {currentCards.map((card) => (
+        <div
+          key={card.id}
+          className="w-full bg-white rounded-lg border border-gray-100 hover:shadow-sm hover:border-blue-100 transition-all duration-150 overflow-hidden flex flex-col"
+          style={{ maxWidth: '360px', height: '410px' }}
+        >
+          {/* Carousel avec flèches inversées */}
+          <div className="relative h-24 flex-grow-0">
+            <div className="overflow-hidden h-full">
               <div
-                key={card.id}
-                className="bg-white shadow-xl rounded-2xl border border-blue-100 hover:shadow-2xl hover:border-blue-200 transition-all duration-200 overflow-hidden"
+                className="flex transition-transform duration-300 ease-in-out h-full"
+                style={{ transform: `translateX(-${(carouselStates[card.id]?.currentIndex || 0) * 100}%)` }}
               >
-                {createCarousel(card.images, card.id)}
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-gray-800">{card.title}</h3>
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full border ${getCategoryColor(card.category)}`}
-                    >
-                      {card.category}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 text-sm mb-3">{card.description}</p>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      {new Date(card.date).toLocaleDateString()}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      {card.images.length} photos
-                    </span>
-                  </div>
-                </div>
+                {card.images.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt={`${card.title} ${index + 1}`}
+                    className="w-full h-full object-cover flex-shrink-0"
+                  />
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* Conteneur des flèches avec espacement fixe */}
+            {card.images.length > 1 && (
+              <div className="absolute inset-0 flex items-center justify-between" >
+                {/* Flèche droite (maintenant à gauche) */}
+                <button
+                  style={{ marginLeft: '10px' }} 
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-full shadow-md transition-all z-10 flex items-center justify-center w-6 h-6"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    moveCarousel(card.id, 1);
+                  }}
+                  aria-label="Image précédente"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                {/* Flèche gauche (maintenant à droite) */}
+                <button
+                  style={{ marginLeft: '290px' }} 
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-full shadow-md transition-all z-10 flex items-center justify-center w-6 h-6"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    moveCarousel(card.id, -1);
+                  }}
+                  aria-label="Image suivante"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            {/* Indicateurs de position */}
+            {card.images.length > 1 && (
+              <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1">
+                {card.images.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`w-1.5 h-1.5 rounded-full transition-all ${
+                      index === (carouselStates[card.id]?.currentIndex || 0) ? "bg-white" : "bg-white bg-opacity-50"
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCarouselStates(prev => ({
+                        ...prev,
+                        [card.id]: { currentIndex: index }
+                      }));
+                    }}
+                    aria-label={`Aller à l'image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {/* Contenu */}
+          <div className="p-2">
+            <div className="flex justify-between items-start mb-1">
+              <h3 className="text-xs font-medium line-clamp-2">{card.title}</h3>
+              <span className={`text-[0.6rem] px-1 py-0.5 rounded ${getCategoryColor(card.category)}`}>
+                {card.category}
+              </span>
+            </div>
+            <p className="text-[0.65rem] text-gray-500 line-clamp-2">{card.description}</p>
+            <div className="flex justify-between text-[0.6rem] text-gray-400 mt-2">
+              <span>{new Date(card.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'})}</span>
+              <span>{card.images.length} photo{card.images.length > 1 ? 's' : ''}</span>
+            </div>
           </div>
         </div>
-
+      ))}
+    </div>
+  </div>
+</div>
         {/* Pagination */}
         <div className="flex flex-wrap mt-6 -mx-3">
           <div className="w-full max-w-full px-3">
