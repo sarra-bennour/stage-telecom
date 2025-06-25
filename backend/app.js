@@ -3,12 +3,9 @@ require('dotenv').config();
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-//const cookieParser = require('cookie-parser');
-//const logger = require('morgan');
 const mongo = require('mongoose');
 const http = require('http');
 const bodyparser = require('body-parser');
-//const transporter = require('./utils/emailConfig'); // Import the transporter from middleware
 const MongoStore = require('connect-mongo');
 const User = require('./models/User')
 const bcrypt = require('bcryptjs');
@@ -65,7 +62,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 
 
@@ -111,7 +108,10 @@ passport.deserializeUser(async (id, done) => {
 
 // Routes
 const usersRouter = require('./routes/userRoute');
+const stationRouter = require('./routes/stationRoute');
+
 app.use('/users', usersRouter);
+app.use('/stations', stationRouter);
 
 // Middleware de vérification d'authentification
 const requireAuth = (req, res, next) => {

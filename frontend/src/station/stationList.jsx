@@ -1,196 +1,230 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import AddStation from "./addStation"
+import PopUp from "./popup"
 
 const StationList = () => {
-  // Sample data for cards
-  const cardsData = [
-    {
-      id: 1,
-      title: "Beautiful Sunset",
-      category: "nature",
-      description: "A stunning sunset over the mountains with vibrant colors painting the sky.",
-      date: "2024-01-15",
-      images: [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      ],
-    },
-    {
-      id: 2,
-      title: "City Skyline",
-      category: "city",
-      description: "Modern city skyline with towering skyscrapers and bustling streets below.",
-      date: "2024-01-20",
-      images: [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      ],
-    },
-    {
-      id: 3,
-      title: "Mountain Adventure",
-      category: "travel",
-      description: "Epic mountain hiking adventure with breathtaking views and challenging trails.",
-      date: "2024-01-10",
-      images: [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      ],
-    },
-    {
-      id: 4,
-      title: "Delicious Cuisine",
-      category: "food",
-      description: "Gourmet dishes prepared with fresh ingredients and artistic presentation.",
-      date: "2024-01-25",
-      images: [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      ],
-    },
-    {
-      id: 5,
-      title: "Ocean Waves",
-      category: "nature",
-      description: "Peaceful ocean waves crashing against the rocky coastline at dawn.",
-      date: "2024-01-12",
-      images: [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      ],
-    },
-    {
-      id: 6,
-      title: "Urban Life",
-      category: "city",
-      description: "The vibrant energy of urban life captured in busy streets and neon lights.",
-      date: "2024-01-18",
-      images: [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      ],
-    },
-    {
-      id: 7,
-      title: "Forest Trail",
-      category: "nature",
-      description: "Serene forest trail winding through ancient trees and dappled sunlight.",
-      date: "2024-01-08",
-      images: [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      ],
-    },
-    {
-      id: 8,
-      title: "Street Food",
-      category: "food",
-      description: "Authentic street food from local vendors with amazing flavors and spices.",
-      date: "2024-01-22",
-      images: [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      ],
-    },
-    {
-      id: 9,
-      title: "Desert Landscape",
-      category: "travel",
-      description: "Vast desert landscape with rolling sand dunes and endless horizons.",
-      date: "2024-01-05",
-      images: [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      ],
-    },
-  ]
-
   // State management
+  const [stationsData, setStationsData] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [filteredData, setFilteredData] = useState([...cardsData])
+  const [filteredData, setFilteredData] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
-  const [categoryFilter, setCategoryFilter] = useState("")
+  const [typeFilter, setTypeFilter] = useState("")
+  const [statusFilter, setStatusFilter] = useState("")
   const [sortFilter, setSortFilter] = useState("newest")
   const [showMap, setShowMap] = useState(false)
   const [carouselStates, setCarouselStates] = useState({})
+  const [searching, setSearching] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // États pour les Popups
+  const [popup, setPopup] = useState({
+    type: "",
+    message: "",
+    isVisible: false,
+  })
+
+  // Fetch stations from backend
+  const fetchStations = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch("http://localhost:3000/stations/station-list")
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des stations")
+      }
+
+      const data = await response.json()
+
+      setStationsData(data.data || [])
+      setFilteredData(data.data || [])
+    } catch (err) {
+      setError(err.message)
+      console.error("Erreur:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Load stations on component mount
+  useEffect(() => {
+    fetchStations()
+  }, [])
+
+  const handleStationAdded = (newStation) => {
+    // Ajouter la nouvelle station à la liste
+    setStationsData((prev) => [newStation, ...prev])
+    setFilteredData((prev) => [newStation, ...prev])
+  }
+
+  const handleSuccess = (message) => {
+    setPopup({
+      type: "success",
+      message: message,
+      isVisible: true,
+    })
+  }
+
+  const handleError = (message) => {
+    setPopup({
+      type: "error",
+      message: message,
+      isVisible: true,
+    })
+  }
+
+  const closePopup = () => {
+    setPopup((prev) => ({
+      ...prev,
+      isVisible: false,
+    }))
+  }
+
+  useEffect(() => {
+    if (searchTerm) {
+      setSearching(true)
+      const timer = setTimeout(() => {
+        setSearching(false)
+      }, 1000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [searchTerm])
 
   const itemsPerPage = 6
 
   // Apply filters and search
   useEffect(() => {
-    const filtered = cardsData.filter((card) => {
+    const filtered = stationsData.filter((station) => {
       const matchesSearch =
-        card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        card.description.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesCategory = !categoryFilter || card.category === categoryFilter
-      return matchesSearch && matchesCategory
+        station.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        station.type_technique?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        station.fournisseur?.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesType = !typeFilter || station.type_technique === typeFilter
+      const matchesStatus = !statusFilter || station.statut === statusFilter
+      return matchesSearch && matchesType && matchesStatus
     })
 
     // Sort data
     filtered.sort((a, b) => {
       switch (sortFilter) {
         case "oldest":
-          return new Date(a.date) - new Date(b.date)
+          return new Date(a.date_installation) - new Date(b.date_installation)
         case "name":
-          return a.title.localeCompare(b.title)
+          return a.nom?.localeCompare(b.nom) || 0
+        case "power":
+          return (b.puissance || 0) - (a.puissance || 0)
         case "newest":
         default:
-          return new Date(b.date) - new Date(a.date)
+          return new Date(b.date_installation) - new Date(a.date_installation)
       }
     })
 
     setFilteredData(filtered)
     setCurrentPage(1)
-  }, [searchTerm, categoryFilter, sortFilter])
+  }, [searchTerm, typeFilter, statusFilter, sortFilter, stationsData])
 
-  // Carousel functionality
-  const moveCarousel = (cardId, direction) => {
-    const card = cardsData.find((c) => c.id === cardId)
-    if (!card) return
-
-    setCarouselStates((prev) => {
-      const currentIndex = prev[cardId]?.currentIndex || 0
-      let newIndex = currentIndex + direction
-
-      if (newIndex < 0) {
-        newIndex = card.images.length - 1
-      } else if (newIndex >= card.images.length) {
-        newIndex = 0
-      }
-
-      return {
-        ...prev,
-        [cardId]: { currentIndex: newIndex },
-      }
-    })
+const moveCarousel = (stationId, direction) => {
+  
+  // Utilisez _id au lieu de id car c'est le champ dans vos données
+  const station = stationsData.find((s) => s._id === stationId)
+  
+  if (!station) {
+    console.error("Station non trouvée pour ID:", stationId)
+    return
   }
 
-  // Get category colors
-  const getCategoryColor = (category) => {
-    const colors = {
-      nature: "bg-green-100 text-green-700 border-green-200",
-      city: "bg-blue-100 text-blue-700 border-blue-200",
-      travel: "bg-red-100 text-red-700 border-red-200",
-      food: "bg-orange-100 text-orange-700 border-orange-200",
+  if (!station.images_secteurs || station.images_secteurs.length <= 1) {
+    console.log("Pas assez d'images pour le carrousel")
+    return
+  }
+
+  setCarouselStates((prev) => {
+    const currentIndex = prev[stationId]?.currentIndex || 0
+    let newIndex = currentIndex + direction
+
+    // Gestion cyclique
+    if (newIndex < 0) {
+      newIndex = station.images_secteurs.length - 1
+    } else if (newIndex >= station.images_secteurs.length) {
+      newIndex = 0
     }
-    return colors[category] || "bg-gray-100 text-gray-700 border-gray-200"
+
+    return {
+      ...prev,
+      [stationId]: { currentIndex: newIndex }
+    }
+  })
+}
+
+  // Get type colors
+  const getTypeColor = (type) => {
+    const colors = {
+      macro: "bg-blue-100 text-blue-700 border-blue-200",
+      micro: "bg-green-100 text-green-700 border-green-200",
+      indoor: "bg-purple-100 text-purple-700 border-purple-200",
+      outdoor: "bg-orange-100 text-orange-700 border-orange-200",
+    }
+    return colors[type] || "bg-gray-100 text-gray-700 border-gray-200"
   }
 
-  // Create carousel component - FIXED VERSION
-  const createCarousel = (images, cardId) => {
-    const currentIndex = carouselStates[cardId]?.currentIndex || 0
+  // Get status colors
+  const getStatusColor = (status) => {
+    const colors = {
+      actif: "bg-green-100 text-green-700",
+      maintenance: "bg-yellow-100 text-yellow-700",
+      inactif: "bg-red-100 text-red-700",
+    }
+    return colors[status] || "bg-gray-100 text-gray-700"
+  }
 
-    if (images.length <= 1) {
+  // Create carousel component
+  const createCarousel = (images_secteurs, stationId) => {
+    const defaultImage = "/placeholder.svg"
+
+    if (!images_secteurs || images_secteurs.length === 0) {
       return (
         <div className="rounded-t-2xl overflow-hidden">
-          <img src={images[0] || "/placeholder.svg"} alt="Card image" className="w-full h-48 object-cover" />
+          <img
+            src={defaultImage || "/placeholder.svg"}
+            alt="Station image par défaut"
+            className="w-full h-48"
+            style={{ objectFit: "contain", backgroundColor: "#f3f4f6" }}
+            onError={(e) => {
+              e.target.src = defaultImage
+            }}
+          />
+        </div>
+      )
+    }
+
+    const currentIndex = carouselStates[stationId]?.currentIndex || 0
+
+    // Préparer les URLs des images
+    const processedImages = images_secteurs.map((img) => {
+      // Si l'image est déjà une URL complète, la garder
+      if (img.startsWith("http://") || img.startsWith("https://")) {
+        return img
+      }
+      // Sinon, ajouter le base URL
+      return `http://localhost:3000${img.startsWith("/") ? img : `/${img}`}`
+    })
+
+    if (processedImages.length <= 1) {
+      return (
+        <div className="rounded-t-2xl overflow-hidden">
+          <img
+            src={processedImages[0] || defaultImage}
+            alt="Station image"
+            className="w-full h-48"
+            style={{ objectFit: "contain", backgroundColor: "#f3f4f6" }}
+            onError={(e) => {
+              e.target.src = defaultImage
+            }}
+          />
         </div>
       )
     }
@@ -202,12 +236,16 @@ const StationList = () => {
             className="flex transition-transform duration-300 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           >
-            {images.map((img, index) => (
+            {processedImages.map((img, index) => (
               <img
                 key={index}
-                src={img || "/placeholder.svg"}
-                alt={`Card image ${index + 1}`}
-                className="w-full h-48 object-cover flex-shrink-0"
+                src={img || defaultImage}
+                alt={`Station image ${index + 1}`}
+                className="w-full h-48 flex-shrink-0"
+                style={{ objectFit: "contain", backgroundColor: "#f3f4f6" }}
+                onError={(e) => {
+                  e.target.src = defaultImage
+                }}
               />
             ))}
           </div>
@@ -215,38 +253,109 @@ const StationList = () => {
 
         {/* Left Arrow */}
         <button
-          className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full transition-all duration-200 z-10"
-          onClick={() => moveCarousel(cardId, -1)}
+          style={{
+            position: "absolute",
+            left: "0.5rem",
+            top: "50%",
+            transform: "translateY(-50%)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            color: "white",
+            padding: "0.5rem",
+            borderRadius: "50%",
+            border: "none",
+            cursor: "pointer",
+            transition: "all 0.2s",
+            zIndex: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "2.5rem",
+            height: "2.5rem",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = "rgba(0, 0, 0, 0.9)"
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = "rgba(0, 0, 0, 0.7)"
+          }}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            moveCarousel(stationId, -1)
+          }}
           aria-label="Previous image"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg style={{ width: "1rem", height: "1rem" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
         {/* Right Arrow */}
         <button
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full transition-all duration-200 z-10"
-          onClick={() => moveCarousel(cardId, 1)}
+          style={{
+            position: "absolute",
+            right: "0.5rem",
+            top: "50%",
+            transform: "translateY(-50%)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            color: "white",
+            padding: "0.5rem",
+            borderRadius: "50%",
+            border: "none",
+            cursor: "pointer",
+            transition: "all 0.2s",
+            zIndex: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "2.5rem",
+            height: "2.5rem",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = "rgba(0, 0, 0, 0.9)"
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = "rgba(0, 0, 0, 0.7)"
+          }}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            moveCarousel(stationId, 1)
+          }}
           aria-label="Next image"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg style={{ width: "1rem", height: "1rem" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
         {/* Dots Indicator */}
-        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
-          {images.map((_, index) => (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "0.5rem",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            gap: "0.25rem",
+          }}
+        >
+          {processedImages.map((_, index) => (
             <button
               key={index}
-              className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                index === currentIndex ? "bg-white bg-opacity-100" : "bg-white bg-opacity-50"
-              }`}
+              style={{
+                width: "0.5rem",
+                height: "0.5rem",
+                borderRadius: "50%",
+                border: "none",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                backgroundColor: index === currentIndex ? "rgba(255, 255, 255, 1)" : "rgba(255, 255, 255, 0.5)",
+              }}
               onClick={() =>
                 setCarouselStates((prev) => ({
                   ...prev,
-                  [cardId]: { currentIndex: index },
+                  [stationId]: { currentIndex: index },
                 }))
               }
               aria-label={`Go to image ${index + 1}`}
@@ -261,10 +370,22 @@ const StationList = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentCards = filteredData.slice(startIndex, endIndex)
+  const currentStations = Array.isArray(filteredData) ? filteredData.slice(startIndex, endIndex) : []
 
   const goToPage = (page) => {
     setCurrentPage(page)
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex-1 bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-lg text-gray-600">Chargement des stations...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -272,7 +393,7 @@ const StationList = () => {
       <div className="px-4 sm:px-6 lg:px-8 py-6">
         {/* Stats Cards Row */}
         <div className="flex flex-wrap -mx-3 mb-6">
-          {/* Card 1 */}
+          {/* Card 1 - Total Stations */}
           <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
             <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-blue-100 hover:shadow-2xl transition-all duration-200">
               <div className="flex-auto p-4">
@@ -280,12 +401,14 @@ const StationList = () => {
                   <div className="flex-none w-2/3 max-w-full px-3">
                     <div>
                       <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-gray-600">
-                        Total Users
+                        Total Stations
                       </p>
-                      <h5 className="mb-2 font-semibold text-gray-800">12,345</h5>
+                      <h5 className="mb-2 font-semibold text-gray-800">{stationsData.length}</h5>
                       <p className="mb-0 text-gray-600">
-                        <span className="text-sm font-semibold leading-normal text-emerald-500">+55%</span> since
-                        yesterday
+                        <span className="text-sm font-semibold leading-normal text-emerald-500">
+                          +{Math.floor(stationsData.length * 0.12)}
+                        </span>{" "}
+                        ce mois-ci
                       </p>
                     </div>
                   </div>
@@ -301,7 +424,7 @@ const StationList = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                          d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
                         />
                       </svg>
                     </div>
@@ -311,25 +434,34 @@ const StationList = () => {
             </div>
           </div>
 
-          {/* Card 2 */}
+          {/* Card 2 - Active Stations */}
           <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
-            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-red-100 hover:shadow-2xl transition-all duration-200">
+            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-green-100 hover:shadow-2xl transition-all duration-200">
               <div className="flex-auto p-4">
                 <div className="flex flex-row -mx-3">
                   <div className="flex-none w-2/3 max-w-full px-3">
                     <div>
                       <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-gray-600">
-                        Revenue
+                        Stations actives
                       </p>
-                      <h5 className="mb-2 font-semibold text-gray-800">$89,432</h5>
+                      <h5 className="mb-2 font-semibold text-gray-800">
+                        {stationsData.filter((s) => s.statut === "actif").length}
+                      </h5>
                       <p className="mb-0 text-gray-600">
-                        <span className="text-sm font-semibold leading-normal text-emerald-500">+3%</span> since last
-                        week
+                        <span className="text-sm font-semibold leading-normal text-emerald-500">
+                          {stationsData.length > 0
+                            ? Math.round(
+                                (stationsData.filter((s) => s.statut === "actif").length / stationsData.length) * 100,
+                              )
+                            : 0}
+                          %
+                        </span>{" "}
+                        du total
                       </p>
                     </div>
                   </div>
                   <div className="px-3 text-right basis-1/3">
-                    <div className="inline-block w-12 h-12 text-center rounded-full bg-gradient-to-tl from-red-500 to-red-600">
+                    <div className="inline-block w-12 h-12 text-center rounded-full bg-gradient-to-tl from-green-500 to-green-600">
                       <svg
                         className="w-6 h-6 text-white relative top-3"
                         fill="none"
@@ -340,7 +472,7 @@ const StationList = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                         />
                       </svg>
                     </div>
@@ -350,25 +482,35 @@ const StationList = () => {
             </div>
           </div>
 
-          {/* Card 3 */}
+          {/* Card 3 - Puissance totale */}
           <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
-            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-blue-100 hover:shadow-2xl transition-all duration-200">
+            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-orange-100 hover:shadow-2xl transition-all duration-200">
               <div className="flex-auto p-4">
                 <div className="flex flex-row -mx-3">
                   <div className="flex-none w-2/3 max-w-full px-3">
                     <div>
                       <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-gray-600">
-                        Orders
+                        Puissance totale
                       </p>
-                      <h5 className="mb-2 font-semibold text-gray-800">1,234</h5>
+                      <h5 className="mb-2 font-semibold text-gray-800">
+                        {stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0)}W
+                      </h5>
                       <p className="mb-0 text-gray-600">
-                        <span className="text-sm font-semibold leading-normal text-red-600">-2%</span> since last
-                        quarter
+                        <span className="text-sm font-semibold leading-normal text-emerald-500">
+                          Moyenne:{" "}
+                          {stationsData.length > 0
+                            ? Math.round(
+                                stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0) /
+                                  stationsData.length,
+                              )
+                            : 0}
+                          W
+                        </span>
                       </p>
                     </div>
                   </div>
                   <div className="px-3 text-right basis-1/3">
-                    <div className="inline-block w-12 h-12 text-center rounded-full bg-gradient-to-tl from-blue-500 to-red-500">
+                    <div className="inline-block w-12 h-12 text-center rounded-full bg-gradient-to-tl from-orange-500 to-red-500">
                       <svg
                         className="w-6 h-6 text-white relative top-3"
                         fill="none"
@@ -379,7 +521,7 @@ const StationList = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01"
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
                         />
                       </svg>
                     </div>
@@ -389,25 +531,35 @@ const StationList = () => {
             </div>
           </div>
 
-          {/* Card 4 */}
+          {/* Card 4 - Maintenance */}
           <div className="w-full max-w-full px-3 sm:w-1/2 sm:flex-none xl:w-1/4">
-            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-red-100 hover:shadow-2xl transition-all duration-200">
+            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-yellow-100 hover:shadow-2xl transition-all duration-200">
               <div className="flex-auto p-4">
                 <div className="flex flex-row -mx-3">
                   <div className="flex-none w-2/3 max-w-full px-3">
                     <div>
                       <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-gray-600">
-                        Rating
+                        En maintenance
                       </p>
-                      <h5 className="mb-2 font-semibold text-gray-800">4.8</h5>
+                      <h5 className="mb-2 font-semibold text-gray-800">
+                        {stationsData.filter((s) => s.statut === "maintenance").length}
+                      </h5>
                       <p className="mb-0 text-gray-600">
-                        <span className="text-sm font-semibold leading-normal text-emerald-500">+5%</span> than last
-                        month
+                        <span className="text-sm font-semibold leading-normal text-red-600">
+                          {stationsData.length > 0
+                            ? Math.round(
+                                (stationsData.filter((s) => s.statut === "maintenance").length / stationsData.length) *
+                                  100,
+                              )
+                            : 0}
+                          %
+                        </span>{" "}
+                        du total
                       </p>
                     </div>
                   </div>
                   <div className="px-3 text-right basis-1/3">
-                    <div className="inline-block w-12 h-12 text-center rounded-full bg-gradient-to-tl from-red-500 to-blue-500">
+                    <div className="inline-block w-12 h-12 text-center rounded-full bg-gradient-to-tl from-yellow-500 to-red-500">
                       <svg
                         className="w-6 h-6 text-white relative top-3"
                         fill="none"
@@ -418,7 +570,7 @@ const StationList = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                         />
                       </svg>
                     </div>
@@ -446,7 +598,7 @@ const StationList = () => {
                       d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
                     />
                   </svg>
-                  Map
+                  Carte des stations
                   <svg
                     className={`w-5 h-5 transition-transform duration-200 ${showMap ? "rotate-180" : ""}`}
                     fill="none"
@@ -459,12 +611,29 @@ const StationList = () => {
 
                 {showMap && (
                   <div className="mt-4">
-                    <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-red-50 rounded-2xl overflow-hidden border border-blue-200">
-                      <img
-                        src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
-                        alt="World Map"
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-red-50 rounded-2xl overflow-hidden border border-blue-200 flex items-center justify-center">
+                      <div className="text-center">
+                        <svg
+                          className="w-16 h-16 text-blue-400 mx-auto mb-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                        <p className="text-gray-600">Carte des stations - {stationsData.length} stations</p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -487,7 +656,7 @@ const StationList = () => {
                       d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"
                     />
                   </svg>
-                  <h2 className="text-lg font-semibold text-gray-800">Search & Filter Cards</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">Rechercher et filtrer les stations</h2>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-4 items-end">
@@ -497,46 +666,60 @@ const StationList = () => {
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder="Search cards..."
-                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                      placeholder={searching ? "Recherche en cours..." : "Rechercher une station..."}
+                      className="search-input w-full pl-12 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                      style={{
+                        backgroundImage: searching
+                          ? "none"
+                          : "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%239CA3AF' viewBox='0 0 24 24'%3E%3Cpath strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E\")",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "left 1rem center",
+                        backgroundSize: "1rem",
+                      }}
                     />
-                    <svg
-                      className="absolute left-3 top-3 h-4 w-4 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
+                    {searching && (
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                        <div className="h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Filters */}
-                  <div className="flex gap-3">
+                  <div className="flex gap-4 flex-wrap">
                     <select
-                      value={categoryFilter}
-                      onChange={(e) => setCategoryFilter(e.target.value)}
+                      value={typeFilter}
+                      onChange={(e) => setTypeFilter(e.target.value)}
                       className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+                      style={{ minWidth: "150px" }}
                     >
-                      <option value="">All Categories</option>
-                      <option value="nature">Nature</option>
-                      <option value="city">City</option>
-                      <option value="travel">Travel</option>
-                      <option value="food">Food</option>
+                      <option value="">Tous les types</option>
+                      <option value="macro">Macro</option>
+                      <option value="micro">Micro</option>
+                      <option value="indoor">Indoor</option>
+                      <option value="outdoor">Outdoor</option>
+                    </select>
+
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+                      style={{ minWidth: "150px" }}
+                    >
+                      <option value="">Tous les statuts</option>
+                      <option value="actif">Actif</option>
+                      <option value="maintenance">Maintenance</option>
                     </select>
 
                     <select
                       value={sortFilter}
                       onChange={(e) => setSortFilter(e.target.value)}
                       className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+                      style={{ minWidth: "150px" }}
                     >
-                      <option value="newest">Newest First</option>
-                      <option value="oldest">Oldest First</option>
-                      <option value="name">Name A-Z</option>
+                      <option value="newest">Plus récentes</option>
+                      <option value="oldest">Plus anciennes</option>
+                      <option value="name">Nom (A-Z)</option>
+                      <option value="power">Puissance (haute)</option>
                     </select>
                   </div>
                 </div>
@@ -544,155 +727,416 @@ const StationList = () => {
             </div>
           </div>
         </div>
-{/* Cards Grid - FIXED LAYOUT */}
-<div className="mt-4 mb-4">
-  <div className="bg-white p-3 rounded-xl border border-gray-100">
-    <div className="flex flex-wrap gap-x-7 gap-y-6 justify-start w-full" style={{ gap: '28px 24px' }}>
-      {currentCards.map((card) => (
-        <div
-          key={card.id}
-          className="w-full bg-white rounded-lg border border-gray-100 hover:shadow-sm hover:border-blue-100 transition-all duration-150 overflow-hidden flex flex-col"
-          style={{ maxWidth: '360px', height: '410px' }}
-        >
-          {/* Carousel avec flèches inversées */}
-          <div className="relative h-24 flex-grow-0">
-            <div className="overflow-hidden h-full">
-              <div
-                className="flex transition-transform duration-300 ease-in-out h-full"
-                style={{ transform: `translateX(-${(carouselStates[card.id]?.currentIndex || 0) * 100}%)` }}
+
+        {/* Stations Grid */}
+        <div className="mt-4 mb-4">
+          <div className="bg-white p-3 rounded-xl border border-gray-100">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Stations ({filteredData.length})</h3>
+              <button
+                onClick={() => setShowModal(true)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.5rem 1rem",
+                  backgroundColor: "#3B82F6",
+                  color: "white",
+                  fontWeight: "500",
+                  borderRadius: "0.5rem",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  outline: "none",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#1d4ed8"
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#3B82F6"
+                }}
               >
-                {card.images.map((img, index) => (
-                  <img
-                    key={index}
-                    src={img}
-                    alt={`${card.title} ${index + 1}`}
-                    className="w-full h-full object-cover flex-shrink-0"
-                  />
-                ))}
-              </div>
+                <svg
+                  style={{ width: "1.25rem", height: "1.25rem" }}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Nouvelle Station
+              </button>
             </div>
 
-            {/* Conteneur des flèches avec espacement fixe */}
-            {card.images.length > 1 && (
-              <div className="absolute inset-0 flex items-center justify-between" >
-                {/* Flèche droite (maintenant à gauche) */}
-                <button
-                  style={{ marginLeft: '10px' }} 
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-full shadow-md transition-all z-10 flex items-center justify-center w-6 h-6"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    moveCarousel(card.id, 1);
-                  }}
-                  aria-label="Image précédente"
+            {filteredData.length === 0 ? (
+              <div className="text-center py-12">
+                <svg
+                  className="w-16 h-16 text-gray-400 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                {/* Flèche gauche (maintenant à droite) */}
-                <button
-                  style={{ marginLeft: '290px' }} 
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-full shadow-md transition-all z-10 flex items-center justify-center w-6 h-6"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    moveCarousel(card.id, -1);
-                  }}
-                  aria-label="Image suivante"
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
+                  />
+                </svg>
+                <p className="text-gray-600">Aucune station trouvée</p>
+                {searchTerm && (
+                  <button onClick={() => setSearchTerm("")} className="mt-2 text-blue-600 hover:text-blue-800">
+                    Effacer la recherche
+                  </button>
+                )}
               </div>
-            )}
-
-            {/* Indicateurs de position */}
-            {card.images.length > 1 && (
-              <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1">
-                {card.images.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`w-1.5 h-1.5 rounded-full transition-all ${
-                      index === (carouselStates[card.id]?.currentIndex || 0) ? "bg-white" : "bg-white bg-opacity-50"
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCarouselStates(prev => ({
-                        ...prev,
-                        [card.id]: { currentIndex: index }
-                      }));
+            ) : (
+              <div className="flex flex-wrap gap-x-7 gap-y-6 justify-start w-full" style={{ gap: "28px 24px" }}>
+                {currentStations.map((station) => (
+                  <div
+                    key={station.id}
+                    style={{
+                      width: "100%",
+                      maxWidth: "360px",
+                      height: "450px",
+                      backgroundColor: "white",
+                      borderRadius: "0.5rem",
+                      border: "1px solid #f3f4f6",
+                      overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
+                      transition: "all 0.15s",
+                      cursor: "pointer",
                     }}
-                    aria-label={`Aller à l'image ${index + 1}`}
-                  />
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow =
+                        "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)"
+                      e.currentTarget.style.borderColor = "#dbeafe"
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = "none"
+                      e.currentTarget.style.borderColor = "#f3f4f6"
+                    }}
+                  >
+                    <div style={{ position: "relative", height: "12rem", flexGrow: 0 }}>
+                      {createCarousel(station.images_secteurs, station._id)}
+                    </div>
+
+                    {/* Content */}
+                    <div style={{ padding: "1rem", display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          marginBottom: "0.5rem",
+                        }}
+                      >
+                        <h3
+                          style={{
+                            fontSize: "1.125rem",
+                            fontWeight: "600",
+                            color: "#1f2937",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {station.nom}
+                        </h3>
+                        <span
+                          style={{
+                            fontSize: "0.75rem",
+                            padding: "0.25rem 0.5rem",
+                            borderRadius: "9999px",
+                            backgroundColor:
+                              station.type_technique === "macro"
+                                ? "#dbeafe"
+                                : station.type_technique === "micro"
+                                  ? "#dcfce7"
+                                  : station.type_technique === "indoor"
+                                    ? "#f3e8ff"
+                                    : "#fed7aa",
+                            color:
+                              station.type_technique === "macro"
+                                ? "#1d4ed8"
+                                : station.type_technique === "micro"
+                                  ? "#16a34a"
+                                  : station.type_technique === "indoor"
+                                    ? "#7c3aed"
+                                    : "#ea580c",
+                            border: `1px solid ${
+                              station.type_technique === "macro"
+                                ? "#bfdbfe"
+                                : station.type_technique === "micro"
+                                  ? "#bbf7d0"
+                                  : station.type_technique === "indoor"
+                                    ? "#e9d5ff"
+                                    : "#fed7aa"
+                            }`,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {station.type_technique}
+                        </span>
+                      </div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "1rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", fontSize: "0.875rem", color: "#4b5563" }}>
+                          <svg
+                            style={{ width: "1rem", height: "1rem", marginRight: "0.5rem", color: "#3b82f6" }}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M13 10V3L4 14h7v7l9-11h-7z"
+                            />
+                          </svg>
+                          <span style={{ fontWeight: "500" }}>Puissance:</span>
+                          <span style={{ marginLeft: "0.25rem", color: "#1f2937" }}>{station.puissance || 0}W</span>
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", fontSize: "0.875rem", color: "#4b5563" }}>
+                          <svg
+                            style={{ width: "1rem", height: "1rem", marginRight: "0.5rem", color: "#10b981" }}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
+                            />
+                          </svg>
+                          <span style={{ fontWeight: "500" }}>Génération:</span>
+                          <span
+                            style={{
+                              marginLeft: "0.25rem",
+                              backgroundColor:
+                                station.generation === "5G"
+                                  ? "#dcfce7"
+                                  : station.generation === "4G"
+                                    ? "#dbeafe"
+                                    : "#fef3c7",
+                              color:
+                                station.generation === "5G"
+                                  ? "#16a34a"
+                                  : station.generation === "4G"
+                                    ? "#1d4ed8"
+                                    : "#d97706",
+                              padding: "0.125rem 0.375rem",
+                              borderRadius: "0.25rem",
+                              fontSize: "0.75rem",
+                              fontWeight: "500",
+                            }}
+                          >
+                            {station.generation || "N/A"}
+                          </span>
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", fontSize: "0.875rem", color: "#4b5563" }}>
+                          <svg
+                            style={{ width: "1rem", height: "1rem", marginRight: "0.5rem", color: "#8b5cf6" }}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                            />
+                          </svg>
+                          <span style={{ fontWeight: "500" }}>Fournisseur:</span>
+                          <span
+                            style={{
+                              marginLeft: "0.25rem",
+                              color: "#1f2937",
+                              backgroundColor: "#f3f4f6",
+                              padding: "0.125rem 0.375rem",
+                              borderRadius: "0.25rem",
+                              fontSize: "0.75rem",
+                              fontWeight: "500",
+                            }}
+                          >
+                            {station.fournisseur || "N/A"}
+                          </span>
+                        </div>
+
+                        {station.position_x && station.position_y && (
+                          <div
+                            style={{ display: "flex", alignItems: "center", fontSize: "0.875rem", color: "#4b5563" }}
+                          >
+                            <svg
+                              style={{ width: "1rem", height: "1rem", marginRight: "0.5rem", color: "#ef4444" }}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg>
+                            <span style={{ fontWeight: "500" }}>Position:</span>
+                            <span style={{ marginLeft: "0.25rem", color: "#1f2937", fontSize: "0.75rem" }}>
+                              {Number.parseFloat(station.position_x).toFixed(4)},{" "}
+                              {Number.parseFloat(station.position_y).toFixed(4)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div style={{ marginTop: "auto" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            padding: "0.75rem",
+                            backgroundColor: "#f9fafb",
+                            borderRadius: "0.5rem",
+                            border: "1px solid #e5e7eb",
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center" }}>
+                            <svg
+                              style={{ width: "1rem", height: "1rem", color: "#3b82f6", marginRight: "0.25rem" }}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <span style={{ fontSize: "0.75rem", color: "#6b7280" }}>
+                              {station.date_installation
+                                ? new Date(station.date_installation).toLocaleDateString("fr-FR", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  })
+                                : "N/A"}
+                            </span>
+                          </div>
+
+                          <span
+                            style={{
+                              fontSize: "0.75rem",
+                              padding: "0.25rem 0.5rem",
+                              borderRadius: "9999px",
+                              backgroundColor: station.statut === "actif" ? "#dcfce7" : "#fef3c7",
+                              color: station.statut === "actif" ? "#16a34a" : "#d97706",
+                              fontWeight: "500",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.25rem",
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: "0.5rem",
+                                height: "0.5rem",
+                                borderRadius: "50%",
+                                backgroundColor: station.statut === "actif" ? "#16a34a" : "#d97706",
+                              }}
+                            />
+                            {station.statut === "actif" ? "Active" : "Maintenance"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
           </div>
-          
-          {/* Contenu */}
-          <div className="p-2">
-            <div className="flex justify-between items-start mb-1">
-              <h3 className="text-xs font-medium line-clamp-2">{card.title}</h3>
-              <span className={`text-[0.6rem] px-1 py-0.5 rounded ${getCategoryColor(card.category)}`}>
-                {card.category}
-              </span>
-            </div>
-            <p className="text-[0.65rem] text-gray-500 line-clamp-2">{card.description}</p>
-            <div className="flex justify-between text-[0.6rem] text-gray-400 mt-2">
-              <span>{new Date(card.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'})}</span>
-              <span>{card.images.length} photo{card.images.length > 1 ? 's' : ''}</span>
-            </div>
-          </div>
         </div>
-      ))}
-    </div>
-  </div>
-</div>
+
         {/* Pagination */}
-        <div className="flex flex-wrap mt-6 -mx-3">
-          <div className="w-full max-w-full px-3">
-            <div className="flex justify-center">
-              <nav className="flex items-center gap-2">
-                <button
-                  onClick={() => currentPage > 1 && goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
+        {totalPages > 1 && (
+          <div className="flex flex-wrap mt-6 -mx-3">
+            <div className="w-full max-w-full px-3">
+              <div className="flex justify-center">
+                <nav className="flex items-center gap-2">
+                  <button
+                    onClick={() => currentPage > 1 && goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
 
-                <div className="flex gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => goToPage(page)}
-                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                        page === currentPage
-                          ? "text-white bg-gradient-to-r from-blue-500 to-red-500 border border-blue-500"
-                          : "text-gray-600 bg-white border border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                </div>
+                  <div className="flex gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => goToPage(page)}
+                        className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                          page === currentPage
+                            ? "text-white bg-blue-500 border border-blue-500"
+                            : "text-gray-600 bg-white border border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </div>
 
-                <button
-                  onClick={() => currentPage < totalPages && goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </nav>
+                  <button
+                    onClick={() => currentPage < totalPages && goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </nav>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
+
+      {/* Modal AddStation */}
+      <AddStation
+        showModal={showModal}
+        setShowModal={setShowModal}
+        onStationAdded={handleStationAdded}
+        onSuccess={handleSuccess}
+        onError={handleError}
+      />
+
+      {/* PopUp */}
+      <PopUp
+        type={popup.type}
+        message={popup.message}
+        isVisible={popup.isVisible}
+        onClose={closePopup}
+      />
     </div>
   )
 }

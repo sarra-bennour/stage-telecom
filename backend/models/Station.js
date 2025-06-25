@@ -23,4 +23,5 @@ const stationSchema = new mongoose.Schema({
   derangements: [{type: mongoose.Schema.Types.ObjectId, ref: 'Derangement'}]
 }, { timestamps: true });
 
+
 module.exports = mongoose.model('Station', stationSchema);

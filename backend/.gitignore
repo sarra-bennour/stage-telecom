@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+public/uploads
 .pnpm-debug.log*
 
 # Environment variables

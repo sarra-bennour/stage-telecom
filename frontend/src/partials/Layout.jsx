@@ -14,9 +14,9 @@ const Layout = () =>{
     return(
         <>
             <div className="dark:bg-slate-900 bg-gray-50">
-                <div class="absolute w-full bg-blue-500 dark:hidden min-h-75"></div>
+                <div className="absolute w-full bg-blue-500 dark:hidden min-h-75"></div>
                 <Sidebar/>
-                <main class="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
+                <main className="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
                     <Navbar/>
                     <Outlet/>
                     <Footer/>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import Layout from './partials/Layout';
 import Dashboard from './partials/Dashboard';
 import Login from './user/login';
