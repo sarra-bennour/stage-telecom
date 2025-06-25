@@ -183,73 +183,89 @@ const moveCarousel = (stationId, direction) => {
 
   // Create carousel component
   const createCarousel = (images_secteurs, stationId) => {
-    const defaultImage = "/placeholder.svg"
+  const defaultImage = "/placeholder.svg";
 
-    if (!images_secteurs || images_secteurs.length === 0) {
-      return (
-        <div className="rounded-t-2xl overflow-hidden">
-          <img
-            src={defaultImage || "/placeholder.svg"}
-            alt="Station image par défaut"
-            className="w-full h-48"
-            style={{ objectFit: "contain", backgroundColor: "#f3f4f6" }}
-            onError={(e) => {
-              e.target.src = defaultImage
-            }}
-          />
-        </div>
-      )
-    }
-
-    const currentIndex = carouselStates[stationId]?.currentIndex || 0
-
-    // Préparer les URLs des images
-    const processedImages = images_secteurs.map((img) => {
-      // Si l'image est déjà une URL complète, la garder
-      if (img.startsWith("http://") || img.startsWith("https://")) {
-        return img
-      }
-      // Sinon, ajouter le base URL
-      return `http://localhost:3000${img.startsWith("/") ? img : `/${img}`}`
-    })
-
-    if (processedImages.length <= 1) {
-      return (
-        <div className="rounded-t-2xl overflow-hidden">
-          <img
-            src={processedImages[0] || defaultImage}
-            alt="Station image"
-            className="w-full h-48"
-            style={{ objectFit: "contain", backgroundColor: "#f3f4f6" }}
-            onError={(e) => {
-              e.target.src = defaultImage
-            }}
-          />
-        </div>
-      )
-    }
-
+  if (!images_secteurs || images_secteurs.length === 0) {
     return (
-      <div className="relative rounded-t-2xl overflow-hidden">
-        <div className="overflow-hidden">
-          <div
-            className="flex transition-transform duration-300 ease-in-out"
-            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-          >
-            {processedImages.map((img, index) => (
+      <div className="rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
+        <img
+          src={defaultImage || "/placeholder.svg"}
+          alt="Station image par défaut"
+          className="w-full h-full"
+          style={{ 
+            objectFit: "cover",
+            backgroundColor: "#f3f4f6",
+            width: "100%",
+            height: "100%"
+          }}
+          onError={(e) => {
+            e.target.src = defaultImage
+          }}
+        />
+      </div>
+    )
+  }
+
+  const currentIndex = carouselStates[stationId]?.currentIndex || 0;
+
+  // Préparer les URLs des images
+  const processedImages = images_secteurs.map((img) => {
+    // Si l'image est déjà une URL complète, la garder
+    if (img.startsWith("http://") || img.startsWith("https://")) {
+      return img
+    }
+    // Sinon, ajouter le base URL
+    return `http://localhost:3000${img.startsWith("/") ? img : `/${img}`}`
+  })
+
+  if (processedImages.length <= 1) {
+    return (
+      <div className="rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
+        <img
+          src={processedImages[0] || defaultImage}
+          alt="Station image"
+          className="w-full h-full"
+          style={{ 
+            objectFit: "cover",
+            backgroundColor: "#f3f4f6",
+            width: "100%",
+            height: "100%"
+          }}
+          onError={(e) => {
+            e.target.src = defaultImage
+          }}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
+      <div className="overflow-hidden h-full">
+        <div
+          className="flex transition-transform duration-300 ease-in-out h-full"
+          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        >
+          {processedImages.map((img, index) => (
+            <div key={index} className="w-full h-full flex-shrink-0">
               <img
-                key={index}
                 src={img || defaultImage}
                 alt={`Station image ${index + 1}`}
-                className="w-full h-48 flex-shrink-0"
-                style={{ objectFit: "contain", backgroundColor: "#f3f4f6" }}
+                className="w-full h-full"
+                style={{ 
+                  objectFit: "cover",
+                  backgroundColor: "#f3f4f6",
+                  width: "100%",
+                  height: "100%"
+                }}
                 onError={(e) => {
                   e.target.src = defaultImage
                 }}
               />
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
+      </div>
 
         {/* Left Arrow */}
         <button
