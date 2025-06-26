@@ -19,7 +19,6 @@ const stationSchema = new mongoose.Schema({
   derniere_maintenance: Date,
   audits: [{type: mongoose.Schema.Types.ObjectId, ref: 'Audit'}],
   transmissions: [{type: mongoose.Schema.Types.ObjectId, ref: 'Transmission'}],
-  antennes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Antenne'}],
   derangements: [{type: mongoose.Schema.Types.ObjectId, ref: 'Derangement'}]
 }, { timestamps: true });
 

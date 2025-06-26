@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import AddStation from "./addStation"
-import PopUp from "./popup"
+import AddUpdateStation from "./addUpdateStation"
+import PopUp from "../partials/popup"
 
 const StationList = () => {
   // State management
@@ -19,6 +19,8 @@ const StationList = () => {
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [editingStation, setEditingStation] = useState(null);
+  const [editMode, setEditMode] = useState(false);
 
   // États pour les Popups
   const [popup, setPopup] = useState({
@@ -59,6 +61,15 @@ const StationList = () => {
     setStationsData((prev) => [newStation, ...prev])
     setFilteredData((prev) => [newStation, ...prev])
   }
+
+  const handleEditClick = (station) => {
+    setEditingStation({
+    ...station,
+    images_secteurs: station.images_secteurs || []
+  });
+    setEditMode(true);
+    setShowModal(true);
+  };
 
   const handleSuccess = (message) => {
     setPopup({
@@ -183,13 +194,13 @@ const moveCarousel = (stationId, direction) => {
 
   // Create carousel component
   const createCarousel = (images_secteurs, stationId) => {
-  const defaultImage = "/placeholder.svg";
+  const defaultImage = "././assets/img/placeholder.jpg";
 
   if (!images_secteurs || images_secteurs.length === 0) {
     return (
       <div className="rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
         <img
-          src={defaultImage || "/placeholder.svg"}
+          src={defaultImage || "././assets/img/placeholder.jpg"}
           alt="Station image par défaut"
           className="w-full h-full"
           style={{ 
@@ -851,14 +862,15 @@ const moveCarousel = (stationId, direction) => {
                           }}
                         >
                           <svg 
-                            width="20" 
-                            height="20" 
+                            width="24" 
+                            height="24" 
                             viewBox="0 0 24 24" 
                             fill="none" 
-                            stroke="currentColor" 
+                            stroke="white" 
                             strokeWidth="2" 
                             strokeLinecap="round" 
                             strokeLinejoin="round"
+                            style={{ filter: "drop-shadow(0 0 2px rgba(0,0,0,0.5))" }}
                           >
                             <circle cx="12" cy="12" r="1"></circle>
                             <circle cx="12" cy="5" r="1"></circle>
@@ -868,13 +880,13 @@ const moveCarousel = (stationId, direction) => {
                         
                         {/* Menu déroulant avec SVG */}
                         {carouselStates[station._id]?.showMenu && (
-                          <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+                          <div className="absolute left-0 mt-1 w-40 bg-white rounded-md shadow-lg z-20 border border-gray-200">
                             <div className="py-1">
                               <button
                                 className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  console.log("Modifier", station._id);
+                                  handleEditClick(station);
                                 }}
                               >
                                 {/* SVG pour l'icône de modification */}
@@ -1228,13 +1240,15 @@ const moveCarousel = (stationId, direction) => {
         )}
       </div>
 
-      {/* Modal AddStation */}
-      <AddStation
+      {/* Modal AddUpdateStation */}
+      <AddUpdateStation
         showModal={showModal}
         setShowModal={setShowModal}
         onStationAdded={handleStationAdded}
         onSuccess={handleSuccess}
         onError={handleError}
+        editingStation={editingStation}
+        editMode={editMode}
       />
 
       {/* PopUp */}

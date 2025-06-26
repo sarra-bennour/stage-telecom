@@ -127,7 +127,7 @@ exports.getStationList = async (req, res) => {
     }
 
     // Options de tri
-    let sortOption = { date_installation: -1 }; // Par défaut: plus récentes en premier
+    let sortOption = { date_installation: -1 };
     
     switch (sort) {
       case 'oldest':
@@ -146,7 +146,7 @@ exports.getStationList = async (req, res) => {
     // Exécuter la requête
     const stations = await Station.find(filter)
       .sort(sortOption)
-      .lean(); // Convertir en objets JavaScript simples
+      .lean();
 
     // Calculer les statistiques pour les cartes d'information
     const totalStations = await Station.countDocuments();
@@ -175,6 +175,76 @@ exports.getStationList = async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Erreur serveur lors de la récupération des stations'
+    });
+  }
+};
+
+
+// Méthode pour mettre à jour une station
+exports.updateStation = async (req, res) => {
+  try {
+    const stationId = req.params.id;
+    const updateData = req.body;
+
+    // Récupérer la station existante
+    const existingStation = await Station.findById(stationId);
+    if (!existingStation) {
+      return res.status(404).json({
+        success: false,
+        message: "Station non trouvée"
+      });
+    }
+
+    // Initialiser avec les images existantes
+    let allImages = existingStation.images_secteurs || [];
+
+    // Gestion des images existantes à conserver
+    if (req.body.existingImages) {
+      // Si existingImages est déjà un tableau (cas où le frontend l'envoie correctement)
+      if (Array.isArray(req.body.existingImages)) {
+        allImages = req.body.existingImages;
+      } 
+      // Si c'est une chaîne qui pourrait être du JSON
+      else if (typeof req.body.existingImages === 'string') {
+        try {
+          const parsedImages = JSON.parse(req.body.existingImages);
+          if (Array.isArray(parsedImages)) {
+            allImages = parsedImages;
+          }
+        } catch (e) {
+          console.error("Erreur parsing existingImages:", e);
+          // Si le parsing échoue, on suppose que c'est une URL simple
+          allImages = [req.body.existingImages];
+        }
+      }
+    }
+
+    // Gestion des nouvelles images
+    if (req.files && req.files.length > 0) {
+      const newImagePaths = req.files.map(file => `/uploads/${file.filename}`);
+      allImages = [...allImages, ...newImagePaths];
+    }
+
+    // Mettre à jour avec toutes les images
+    updateData.images_secteurs = allImages;
+
+    const updatedStation = await Station.findByIdAndUpdate(
+      stationId,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Station mise à jour avec succès",
+      data: updatedStation
+    });
+
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Erreur lors de la mise à jour de la station"
     });
   }
 };

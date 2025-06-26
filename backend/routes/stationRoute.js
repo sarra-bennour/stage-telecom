@@ -7,6 +7,7 @@ const stationController = require('../controllers/stationController');
 router.get('/station-list',stationController.getStationList)
 router.post('/create-station',upload.array('images', 5), stationController.createStation);
 router.delete('/:stationId/images/:imageId', stationController.deleteImage);
+router.put('/update-station/:id',upload.array('images', 5),stationController.updateStation);
 
 
 module.exports = router;

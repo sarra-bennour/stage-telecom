@@ -7,6 +7,7 @@ import Login from './user/login';
 import Signup from './user/signup';
 import ProtectedRoute from './partials/ProtectedRoute';
 import StationList from './station/stationList';
+import AntennesList from './antennes/antennesList';
 
 function App() {
   return (
@@ -23,6 +24,11 @@ function App() {
           <Route path='/station-list' element={
             <ProtectedRoute>
               <StationList/>
+            </ProtectedRoute>
+          } />
+          <Route path='/antenne-list' element={
+            <ProtectedRoute>
+              <AntennesList/>
             </ProtectedRoute>
           } />
         </Route>

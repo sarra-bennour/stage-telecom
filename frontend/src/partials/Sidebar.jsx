@@ -51,12 +51,21 @@ const Sidebar = () =>{
           </NavLink>
       </li>
       <li className="mt-0.5 w-full">
-        <a className=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors" href="./pages/billing.html">
+        <NavLink
+            to="/antenne-list"
+            className={({ isActive }) =>
+              `py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg ${
+                isActive
+                  ? 'bg-blue-500/20 bg-blue-500/13 text-blue-700 font-semibold'
+                  : 'text-slate-700 dark:text-white dark:opacity-80'
+              }`
+            }
+          >
           <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center fill-current stroke-0 text-center xl:p-2.5">
             <i class="las la-wifi relative top-0 text-xl leading-normal text-emerald-500"></i>
           </div>
           <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Antennes</span>
-        </a>
+        </NavLink>
       </li>
       <li className="mt-0.5 w-full">
         <a className=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors" href="./pages/virtual-reality.html">
