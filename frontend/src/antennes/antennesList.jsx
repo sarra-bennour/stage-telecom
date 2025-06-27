@@ -205,81 +205,197 @@ filtered.sort((a, b) => {
     <div className="antenne-crud">
       <div className="antenne-crud-container">        
 
-        {/* Stats Cards */}
-        <div className="antenne-crud-stats">
-          <div className="antenne-crud-stat-card">
-            <div className="antenne-crud-stat-content">
-              <div className="antenne-crud-stat-icon total">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
-                  />
-                </svg>
-              </div>
-              <div className="antenne-crud-stat-info">
-                <dt className="antenne-crud-stat-label">Total</dt>
-                <dd className="antenne-crud-stat-value">{antennesData.length}</dd>
-              </div>
-            </div>
-          </div>
+       {/* Stats Cards */}
+<div style={{ 
+  display: 'grid', 
+  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+  gap: '1.5rem',
+  marginBottom: '2rem'
+}}>
+  {/* Students Card */}
+  <div style={{
+    backgroundColor: 'white',
+    borderRadius: '0.9rem',
+    padding: '1.25rem',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+  }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{
+        width: '3rem',
+        height: '3rem',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: '1rem'
+      }}>
+        <i className="fas fa-users" style={{ color: '#6366F1', fontSize: '1.25rem' }}></i>
+      </div>
+      <div>
+        <p style={{ 
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          color: '#6B7280',
+          marginBottom: '0.25rem'
+        }}>Students</p>
+        <p style={{
+          fontSize: '1.5rem',
+          fontWeight: '600',
+          color: '#111827',
+          marginBottom: '0.25rem'
+        }}>62,784</p>
+        <p style={{
+          fontSize: '0.75rem',
+          color: '#10B981',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          <i className="fas fa-arrow-up" style={{ marginRight: '0.25rem' }}></i>
+          2%+
+        </p>
+      </div>
+    </div>
+  </div>
 
-          <div className="antenne-crud-stat-card">
-            <div className="antenne-crud-stat-content">
-              <div className="antenne-crud-stat-icon active">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div className="antenne-crud-stat-info">
-                <dt className="antenne-crud-stat-label">Actives</dt>
-                <dd className="antenne-crud-stat-value">{antennesData.filter((a) => a.etat === "actif").length}</dd>
-              </div>
-            </div>
-          </div>
+  {/* Teachers Card */}
+  <div style={{
+    backgroundColor: 'white',
+    borderRadius: '0.9rem',
+    padding: '1.25rem',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+  }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{
+        width: '3rem',
+        height: '3rem',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: '1rem'
+      }}>
+        <i className="fas fa-chalkboard-teacher" style={{ color: '#10B981', fontSize: '1.25rem' }}></i>
+      </div>
+      <div>
+        <p style={{ 
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          color: '#6B7280',
+          marginBottom: '0.25rem'
+        }}>Teachers</p>
+        <p style={{
+          fontSize: '1.5rem',
+          fontWeight: '600',
+          color: '#111827',
+          marginBottom: '0.25rem'
+        }}>3,765</p>
+        <p style={{
+          fontSize: '0.75rem',
+          color: '#10B981',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          <i className="fas fa-arrow-up" style={{ marginRight: '0.25rem' }}></i>
+          5%+
+        </p>
+      </div>
+    </div>
+  </div>
 
-          <div className="antenne-crud-stat-card">
-            <div className="antenne-crud-stat-content">
-              <div className="antenne-crud-stat-icon fiveg">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div className="antenne-crud-stat-info">
-                <dt className="antenne-crud-stat-label">5G</dt>
-                <dd className="antenne-crud-stat-value">{antennesData.filter((a) => a.type === "5G").length}</dd>
-              </div>
-            </div>
-          </div>
+  {/* Total Staff Card */}
+  <div style={{
+    backgroundColor: 'white',
+    borderRadius: '0.9rem',
+    padding: '1.25rem',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+  }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{
+        width: '3rem',
+        height: '3rem',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: '1rem'
+      }}>
+        <i className="fas fa-user-tie" style={{ color: '#F59E0B', fontSize: '1.25rem' }}></i>
+      </div>
+      <div>
+        <p style={{ 
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          color: '#6B7280',
+          marginBottom: '0.25rem'
+        }}>Total Staff</p>
+        <p style={{
+          fontSize: '1.5rem',
+          fontWeight: '600',
+          color: '#111827',
+          marginBottom: '0.25rem'
+        }}>8,475</p>
+        <p style={{
+          fontSize: '0.75rem',
+          color: '#EF4444',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          <i className="fas fa-arrow-down" style={{ marginRight: '0.25rem' }}></i>
+          1%-
+        </p>
+      </div>
+    </div>
+  </div>
 
-          <div className="antenne-crud-stat-card">
-            <div className="antenne-crud-stat-content">
-              <div className="antenne-crud-stat-icon maintenance">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              <div className="antenne-crud-stat-info">
-                <dt className="antenne-crud-stat-label">Maintenance</dt>
-                <dd className="antenne-crud-stat-value">
-                  {antennesData.filter((a) => a.etat === "maintenance").length}
-                </dd>
-              </div>
-            </div>
-          </div>
-        </div>
+  {/* Revenue Card */}
+  <div style={{
+    backgroundColor: 'white',
+    borderRadius: '0.9rem',
+    padding: '1.25rem',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+  }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{
+        width: '3rem',
+        height: '3rem',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: '1rem'
+      }}>
+        <i className="fas fa-dollar-sign" style={{ color: '#EF4444', fontSize: '1.25rem' }}></i>
+      </div>
+      <div>
+        <p style={{ 
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          color: '#6B7280',
+          marginBottom: '0.25rem'
+        }}>Revenue</p>
+        <p style={{
+          fontSize: '1.5rem',
+          fontWeight: '600',
+          color: '#111827',
+          marginBottom: '0.25rem'
+        }}>$22,987</p>
+        <p style={{
+          fontSize: '0.75rem',
+          color: '#10B981',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          <i className="fas fa-arrow-up" style={{ marginRight: '0.25rem' }}></i>
+          3%+
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 
         {/* Filters and Search */}
         <div className="antenne-crud-filters">

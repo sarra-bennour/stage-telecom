@@ -429,14 +429,14 @@ const moveCarousel = (stationId, direction) => {
       <div className="flex-auto p-4">
         <div className="flex items-center">
           {/* Cercle avec icône */}
-          <div className="flex-shrink-0 w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
-            <i className="fas fa-tower-cell text-blue-600 text-2xl"></i>
+          <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}>
+            <i className="fas fa-tower-cell text-2xl" style={{ color: '#3B82F6' }}></i>
           </div>
           
           <div>
-            <p className="mb-0 text-sm font-semibold text-gray-600 uppercase">Total Stations</p>
-            <h5 className="mb-1 text-2xl font-bold text-gray-800">{stationsData.length}</h5>
-            <p className="text-xs text-emerald-500">
+            <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Total Stations</p>
+            <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>{stationsData.length}</h5>
+            <p className="text-xs" style={{ color: '#10B981' }}>
               <i className="fas fa-arrow-up mr-1"></i> +{Math.floor(stationsData.length * 0.12)} ce mois-ci
             </p>
           </div>
@@ -450,16 +450,16 @@ const moveCarousel = (stationId, direction) => {
     <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
       <div className="flex-auto p-4">
         <div className="flex items-center">
-          <div className="flex-shrink-0 w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mr-4">
-            <i className="fas fa-check-circle text-green-600 text-2xl"></i>
+          <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
+            <i className="fas fa-check-circle text-2xl" style={{ color: '#10B981' }}></i>
           </div>
           
           <div>
-            <p className="mb-0 text-sm font-semibold text-gray-600 uppercase">Stations Actives</p>
-            <h5 className="mb-1 text-2xl font-bold text-gray-800">
+            <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Stations Actives</p>
+            <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>
               {stationsData.filter((s) => s.statut === "actif").length}
             </h5>
-            <p className="text-xs text-emerald-500">
+            <p className="text-xs" style={{ color: '#10B981' }}>
               {stationsData.length > 0
                 ? Math.round(
                     (stationsData.filter((s) => s.statut === "actif").length / stationsData.length) * 100
@@ -477,16 +477,16 @@ const moveCarousel = (stationId, direction) => {
     <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
       <div className="flex-auto p-4">
         <div className="flex items-center">
-          <div className="flex-shrink-0 w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mr-4">
-            <i className="fas fa-bolt text-orange-600 text-2xl"></i>
+          <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(249, 115, 22, 0.1)' }}>
+            <i className="fas fa-bolt text-2xl" style={{ color: '#F97316' }}></i>
           </div>
           
           <div>
-            <p className="mb-0 text-sm font-semibold text-gray-600 uppercase">Puissance Totale</p>
-            <h5 className="mb-1 text-2xl font-bold text-gray-800">
+            <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Puissance Totale</p>
+            <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>
               {stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0)}W
             </h5>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs" style={{ color: '#6B7280' }}>
               Moyenne: {stationsData.length > 0
                 ? Math.round(
                     stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0) / stationsData.length
@@ -504,16 +504,16 @@ const moveCarousel = (stationId, direction) => {
     <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
       <div className="flex-auto p-4">
         <div className="flex items-center">
-          <div className="flex-shrink-0 w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mr-4">
-            <i className="fas fa-tools text-yellow-600 text-2xl"></i>
+          <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)' }}>
+            <i className="fas fa-tools text-2xl" style={{ color: '#EAB308' }}></i>
           </div>
           
           <div>
-            <p className="mb-0 text-sm font-semibold text-gray-600 uppercase">Maintenance</p>
-            <h5 className="mb-1 text-2xl font-bold text-gray-800">
+            <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Maintenance</p>
+            <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>
               {stationsData.filter((s) => s.statut === "maintenance").length}
             </h5>
-            <p className="text-xs text-red-500">
+            <p className="text-xs" style={{ color: '#EF4444' }}>
               {stationsData.length > 0
                 ? Math.round(
                     (stationsData.filter((s) => s.statut === "maintenance").length / stationsData.length) * 100
