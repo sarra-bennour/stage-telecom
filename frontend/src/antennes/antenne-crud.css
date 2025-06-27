@@ -73,7 +73,7 @@
   background-color: white;
   overflow: hidden;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
+  border-radius: 0.9rem;
   padding: 1.25rem;
 }
 
@@ -138,7 +138,7 @@
 .antenne-crud-filters {
   background-color: white;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
+  border-radius: 0.9rem;
   margin-bottom: 1.5rem;
 }
 
@@ -271,7 +271,7 @@
 .antenne-crud-table-container {
   background-color: white;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
+  border-radius: 0.9rem;
   overflow: hidden;
 }
 
@@ -1040,4 +1040,21 @@
   background-position: right 10px center !important;
   background-size: 16px !important;
   padding-right: 36px !important;
+}
+
+/* Ajoutez ces styles à la section des selects existants */
+.antenne-crud-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 16px !important;
+  padding-right: 36px !important;
+}
+
+/* Pour IE (anciennes versions) */
+.antenne-crud-select::-ms-expand {
+  display: none !important;
 }

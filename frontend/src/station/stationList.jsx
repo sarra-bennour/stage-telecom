@@ -422,194 +422,110 @@ const moveCarousel = (stationId, direction) => {
     <div className="flex-1 bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
       <div className="px-4 sm:px-6 lg:px-8 py-6">
         {/* Stats Cards Row */}
-        <div className="flex flex-wrap -mx-3 mb-6">
-          {/* Card 1 - Total Stations */}
-          <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
-            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-blue-100 hover:shadow-2xl transition-all duration-200">
-              <div className="flex-auto p-4">
-                <div className="flex flex-row -mx-3">
-                  <div className="flex-none w-2/3 max-w-full px-3">
-                    <div>
-                      <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-gray-600">
-                        Total Stations
-                      </p>
-                      <h5 className="mb-2 font-semibold text-gray-800">{stationsData.length}</h5>
-                      <p className="mb-0 text-gray-600">
-                        <span className="text-sm font-semibold leading-normal text-emerald-500">
-                          +{Math.floor(stationsData.length * 0.12)}
-                        </span>{" "}
-                        ce mois-ci
-                      </p>
-                    </div>
-                  </div>
-                  <div className="px-3 text-right basis-1/3">
-                    <div className="inline-block w-12 h-12 text-center rounded-full bg-gradient-to-tl from-blue-500 to-blue-600">
-                      <svg
-                        className="w-6 h-6 text-white relative top-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+<div className="flex flex-wrap -mx-3 mb-6">
+  {/* Card 1 - Total Stations */}
+  <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+    <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
+      <div className="flex-auto p-4">
+        <div className="flex items-center">
+          {/* Cercle avec icône */}
+          <div className="flex-shrink-0 w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+            <i className="fas fa-tower-cell text-blue-600 text-2xl"></i>
           </div>
-
-          {/* Card 2 - Active Stations */}
-          <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
-            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-green-100 hover:shadow-2xl transition-all duration-200">
-              <div className="flex-auto p-4">
-                <div className="flex flex-row -mx-3">
-                  <div className="flex-none w-2/3 max-w-full px-3">
-                    <div>
-                      <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-gray-600">
-                        Stations actives
-                      </p>
-                      <h5 className="mb-2 font-semibold text-gray-800">
-                        {stationsData.filter((s) => s.statut === "actif").length}
-                      </h5>
-                      <p className="mb-0 text-gray-600">
-                        <span className="text-sm font-semibold leading-normal text-emerald-500">
-                          {stationsData.length > 0
-                            ? Math.round(
-                                (stationsData.filter((s) => s.statut === "actif").length / stationsData.length) * 100,
-                              )
-                            : 0}
-                          %
-                        </span>{" "}
-                        du total
-                      </p>
-                    </div>
-                  </div>
-                  <div className="px-3 text-right basis-1/3">
-                    <div className="inline-block w-12 h-12 text-center rounded-full bg-gradient-to-tl from-green-500 to-green-600">
-                      <svg
-                        className="w-6 h-6 text-white relative top-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3 - Puissance totale */}
-          <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
-            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-orange-100 hover:shadow-2xl transition-all duration-200">
-              <div className="flex-auto p-4">
-                <div className="flex flex-row -mx-3">
-                  <div className="flex-none w-2/3 max-w-full px-3">
-                    <div>
-                      <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-gray-600">
-                        Puissance totale
-                      </p>
-                      <h5 className="mb-2 font-semibold text-gray-800">
-                        {stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0)}W
-                      </h5>
-                      <p className="mb-0 text-gray-600">
-                        <span className="text-sm font-semibold leading-normal text-emerald-500">
-                          Moyenne:{" "}
-                          {stationsData.length > 0
-                            ? Math.round(
-                                stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0) /
-                                  stationsData.length,
-                              )
-                            : 0}
-                          W
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="px-3 text-right basis-1/3">
-                    <div className="inline-block w-12 h-12 text-center rounded-full bg-gradient-to-tl from-orange-500 to-red-500">
-                      <svg
-                        className="w-6 h-6 text-white relative top-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 10V3L4 14h7v7l9-11h-7z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 4 - Maintenance */}
-          <div className="w-full max-w-full px-3 sm:w-1/2 sm:flex-none xl:w-1/4">
-            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-yellow-100 hover:shadow-2xl transition-all duration-200">
-              <div className="flex-auto p-4">
-                <div className="flex flex-row -mx-3">
-                  <div className="flex-none w-2/3 max-w-full px-3">
-                    <div>
-                      <p className="mb-0 font-sans text-sm font-semibold leading-normal uppercase text-gray-600">
-                        En maintenance
-                      </p>
-                      <h5 className="mb-2 font-semibold text-gray-800">
-                        {stationsData.filter((s) => s.statut === "maintenance").length}
-                      </h5>
-                      <p className="mb-0 text-gray-600">
-                        <span className="text-sm font-semibold leading-normal text-red-600">
-                          {stationsData.length > 0
-                            ? Math.round(
-                                (stationsData.filter((s) => s.statut === "maintenance").length / stationsData.length) *
-                                  100,
-                              )
-                            : 0}
-                          %
-                        </span>{" "}
-                        du total
-                      </p>
-                    </div>
-                  </div>
-                  <div className="px-3 text-right basis-1/3">
-                    <div className="inline-block w-12 h-12 text-center rounded-full bg-gradient-to-tl from-yellow-500 to-red-500">
-                      <svg
-                        className="w-6 h-6 text-white relative top-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          
+          <div>
+            <p className="mb-0 text-sm font-semibold text-gray-600 uppercase">Total Stations</p>
+            <h5 className="mb-1 text-2xl font-bold text-gray-800">{stationsData.length}</h5>
+            <p className="text-xs text-emerald-500">
+              <i className="fas fa-arrow-up mr-1"></i> +{Math.floor(stationsData.length * 0.12)} ce mois-ci
+            </p>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Card 2 - Active Stations */}
+  <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+    <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
+      <div className="flex-auto p-4">
+        <div className="flex items-center">
+          <div className="flex-shrink-0 w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mr-4">
+            <i className="fas fa-check-circle text-green-600 text-2xl"></i>
+          </div>
+          
+          <div>
+            <p className="mb-0 text-sm font-semibold text-gray-600 uppercase">Stations Actives</p>
+            <h5 className="mb-1 text-2xl font-bold text-gray-800">
+              {stationsData.filter((s) => s.statut === "actif").length}
+            </h5>
+            <p className="text-xs text-emerald-500">
+              {stationsData.length > 0
+                ? Math.round(
+                    (stationsData.filter((s) => s.statut === "actif").length / stationsData.length) * 100
+                  )
+                : 0}% du total
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Card 3 - Puissance totale */}
+  <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+    <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
+      <div className="flex-auto p-4">
+        <div className="flex items-center">
+          <div className="flex-shrink-0 w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mr-4">
+            <i className="fas fa-bolt text-orange-600 text-2xl"></i>
+          </div>
+          
+          <div>
+            <p className="mb-0 text-sm font-semibold text-gray-600 uppercase">Puissance Totale</p>
+            <h5 className="mb-1 text-2xl font-bold text-gray-800">
+              {stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0)}W
+            </h5>
+            <p className="text-xs text-gray-500">
+              Moyenne: {stationsData.length > 0
+                ? Math.round(
+                    stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0) / stationsData.length
+                  )
+                : 0}W
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Card 4 - Maintenance */}
+  <div className="w-full max-w-full px-3 sm:w-1/2 sm:flex-none xl:w-1/4">
+    <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
+      <div className="flex-auto p-4">
+        <div className="flex items-center">
+          <div className="flex-shrink-0 w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mr-4">
+            <i className="fas fa-tools text-yellow-600 text-2xl"></i>
+          </div>
+          
+          <div>
+            <p className="mb-0 text-sm font-semibold text-gray-600 uppercase">Maintenance</p>
+            <h5 className="mb-1 text-2xl font-bold text-gray-800">
+              {stationsData.filter((s) => s.statut === "maintenance").length}
+            </h5>
+            <p className="text-xs text-red-500">
+              {stationsData.length > 0
+                ? Math.round(
+                    (stationsData.filter((s) => s.statut === "maintenance").length / stationsData.length) * 100
+                  )
+                : 0}% du total
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
         {/* Map Section */}
 <div className="flex flex-wrap mt-6 -mx-3 mb-6">

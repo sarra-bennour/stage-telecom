@@ -203,31 +203,7 @@ filtered.sort((a, b) => {
 
   return (
     <div className="antenne-crud">
-      <div className="antenne-crud-container">
-        {/* Header */}
-        <div className="antenne-crud-header">
-          <div className="antenne-crud-header-content">
-            <div>
-              <h1 className="antenne-crud-title">Gestion des Antennes</h1>
-              <p className="antenne-crud-subtitle">Gérez vos antennes de télécommunication</p>
-            </div>
-            <div>
-              <button
-                onClick={() => {
-                  setEditMode(false)
-                  setEditingAntenne(null)
-                  setShowModal(true)
-                }}
-                className="antenne-crud-add-btn"
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Nouvelle Antenne
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="antenne-crud-container">        
 
         {/* Stats Cards */}
         <div className="antenne-crud-stats">
@@ -376,8 +352,25 @@ filtered.sort((a, b) => {
           )}
         </div>
 
+        <div style={{marginLeft:"980px" , marginBottom:"10px"}}>
+              <button
+                onClick={() => {
+                  setEditMode(false)
+                  setEditingAntenne(null)
+                  setShowModal(true)
+                }}
+                className="antenne-crud-add-btn"
+              >
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Nouvelle Antenne
+              </button>
+            </div>
+
         {/* Table */}
         <div className="antenne-crud-table-container">
+          
           <div className="antenne-crud-table-wrapper">
             <table className="antenne-crud-table">
               <thead>
