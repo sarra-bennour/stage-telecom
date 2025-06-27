@@ -132,26 +132,24 @@ const AntennesList = () => {
     })
 
     // Sort data
-    filtered.sort((a, b) => {
-      let aValue = a[sortField]
-      let bValue = b[sortField]
+    // Dans le useEffect qui gère le filtrage et le tri
+filtered.sort((a, b) => {
+  const getValue = (item, field) => {
+    if (field === "station") {
+      return item.station?.nom || "";
+    }
+    return item[field] || "";
+  };
 
-      if (sortField === "station") {
-        aValue = a.station?.nom || ""
-        bValue = b.station?.nom || ""
-      }
+  const aValue = String(getValue(a, sortField)).toLowerCase();
+  const bValue = String(getValue(b, sortField)).toLowerCase();
 
-      if (typeof aValue === "string") {
-        aValue = aValue.toLowerCase()
-        bValue = bValue.toLowerCase()
-      }
-
-      if (sortDirection === "asc") {
-        return aValue > bValue ? 1 : -1
-      } else {
-        return aValue < bValue ? 1 : -1
-      }
-    })
+  if (sortDirection === "asc") {
+    return aValue.localeCompare(bValue);
+  } else {
+    return bValue.localeCompare(aValue);
+  }
+});
 
     setFilteredData(filtered)
     setCurrentPage(1)

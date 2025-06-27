@@ -153,12 +153,12 @@ const AddAntenne = ({ showModal, setShowModal, onAntenneAdded, onSuccess, onErro
   }
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+    <div className="fixed1" onClick={() => setShowModal(false)}>
+      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b">
-          <h3 className="text-lg font-medium text-gray-900">{editMode ? "Modifier l'Antenne" : "Nouvelle Antenne"}</h3>
-          <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
+        <div className="modal-header">
+          <h3 className="modal-title">{editMode ? "Modifier l'Antenne" : "Nouvelle Antenne"}</h3>
+          <button onClick={() => setShowModal(false)} className="modal-close-btn">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -166,6 +166,7 @@ const AddAntenne = ({ showModal, setShowModal, onAntenneAdded, onSuccess, onErro
         </div>
 
         {/* Form */}
+        <div className="modal-body">
         <form onSubmit={handleSubmit} className="antenne-form-content">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Type */}
@@ -392,10 +393,11 @@ const AddAntenne = ({ showModal, setShowModal, onAntenneAdded, onSuccess, onErro
               disabled={isLoading}
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              {isLoading ? "En cours..." : editMode ? "Mettre à jour" : "Créer"}
+              {isLoading ? "En cours..." : editMode ? "Mettre à jour" : "Enregister"}
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   )

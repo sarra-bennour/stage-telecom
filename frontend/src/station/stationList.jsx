@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import AddUpdateStation from "./addUpdateStation"
 import PopUp from "../partials/popup"
+import StationMap from "./stationMap"
+
 
 const StationList = () => {
   // State management
@@ -249,6 +251,7 @@ const moveCarousel = (stationId, direction) => {
       </div>
     )
   }
+  
 
   return (
     <div className="relative rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
@@ -609,65 +612,49 @@ const moveCarousel = (stationId, direction) => {
         </div>
 
         {/* Map Section */}
-        <div className="flex flex-wrap mt-6 -mx-3 mb-6">
-          <div className="w-full max-w-full px-3">
-            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-blue-100">
-              <div className="flex-auto p-6">
-                <button
-                  onClick={() => setShowMap(!showMap)}
-                  className="text-2xl font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-200 flex items-center gap-2"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                    />
-                  </svg>
-                  Carte des stations
-                  <svg
-                    className={`w-5 h-5 transition-transform duration-200 ${showMap ? "rotate-180" : ""}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+<div className="flex flex-wrap mt-6 -mx-3 mb-6">
+  <div className="w-full max-w-full px-3">
+    <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-blue-100">
+      <div className="flex-auto p-6">
+        <button
+          onClick={() => setShowMap(!showMap)}
+          className="text-2xl font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-200 flex items-center gap-2"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+            />
+          </svg>
+          Carte des stations ({stationsData.filter(s => s.position_x && s.position_y).length} localisées)
+          <svg
+            className={`w-5 h-5 transition-transform duration-200 ${showMap ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
 
-                {showMap && (
-                  <div className="mt-4">
-                    <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-red-50 rounded-2xl overflow-hidden border border-blue-200 flex items-center justify-center">
-                      <div className="text-center">
-                        <svg
-                          className="w-16 h-16 text-blue-400 mx-auto mb-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
-                        <p className="text-gray-600">Carte des stations - {stationsData.length} stations</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+        {showMap && (
+          <div className="mt-4">
+            <div className="w-full h-96 rounded-2xl overflow-hidden border border-blue-200">
+              <StationMap 
+                stations={stationsData} 
+                onStationClick={(station) => {
+                  console.log('Station cliquée:', station)
+                }}
+              />
             </div>
           </div>
-        </div>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
 
         {/* Search and Filters */}
         <div className="flex flex-wrap mt-6 -mx-3 mb-6">
