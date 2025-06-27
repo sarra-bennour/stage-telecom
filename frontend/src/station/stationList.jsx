@@ -641,7 +641,7 @@ const moveCarousel = (stationId, direction) => {
 
         {showMap && (
           <div className="mt-4">
-            <div className="w-full h-96 rounded-2xl overflow-hidden border border-blue-200">
+            <div className="w-full max-w-6xl mx-auto h-96 rounded-2xl overflow-hidden border border-blue-200">
               <StationMap 
                 stations={stationsData} 
                 onStationClick={(station) => {

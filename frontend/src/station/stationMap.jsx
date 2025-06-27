@@ -9,7 +9,6 @@ const StationMap = ({ stations = [], onStationClick }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-    console.log("Stations reçues dans StationMap:", stations)
 
 
   useEffect(() => {
@@ -354,7 +353,7 @@ const StationMap = ({ stations = [], onStationClick }) => {
           height: '100%',
           borderRadius: '16px',
           overflow: 'hidden',
-          minHeight: '300px' // Ajout d'une hauteur minimale
+          minHeight: '500px'
         }} 
       />
       
