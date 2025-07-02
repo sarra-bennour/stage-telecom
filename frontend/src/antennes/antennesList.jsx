@@ -1,12 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import axios from "axios";
 import AddAntenne from "./addAntenne"
 import PopUp from "../partials/popup"
 import "./antenne-crud.css"
 
 const AntennesList = () => {
   // State management
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [antennesData, setAntennesData] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [filteredData, setFilteredData] = useState([])
@@ -27,6 +30,24 @@ const AntennesList = () => {
     message: "",
     isVisible: false,
   })
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/users/check-auth', {
+          withCredentials: true
+        });
+        console.log("userrrrr",response.data.data.user)
+        setUser(response.data.data?.user || null);
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   // Fetch antennes from backend
   const fetchAntennes = async () => {
@@ -319,7 +340,7 @@ filtered.sort((a, b) => {
           </div>
 
           {/* Bulk Actions */}
-          {selectedItems.length > 0 && (
+          {selectedItems.length > 0 && user?.role === 'admin' && (
             <div className="antenne-crud-bulk-actions">
               <span className="antenne-crud-bulk-text">{selectedItems.length} élément(s) sélectionné(s)</span>
               <button onClick={handleBulkDelete} className="antenne-crud-bulk-delete-btn">
@@ -338,6 +359,7 @@ filtered.sort((a, b) => {
         </div>
 
         <div style={{marginLeft:"980px" , marginBottom:"10px"}}>
+          {user?.role !== 'technicien' && (
               <button
                 onClick={() => {
                   setEditMode(false)
@@ -351,6 +373,7 @@ filtered.sort((a, b) => {
                 </svg>
                 Nouvelle Antenne
               </button>
+          )}
             </div>
 
         {/* Table */}
@@ -360,6 +383,7 @@ filtered.sort((a, b) => {
             <table className="antenne-crud-table">
               <thead>
                 <tr>
+                  {user?.role === 'admin' && (
                   <th className="checkbox-cell">
                     <input
                       type="checkbox"
@@ -368,6 +392,7 @@ filtered.sort((a, b) => {
                       className="antenne-crud-checkbox"
                     />
                   </th>
+                  )}
                   <th className="sortable" onClick={() => handleSort("type")}>
                     <div className="sort-header">
                       <span>Type</span>
@@ -443,7 +468,9 @@ filtered.sort((a, b) => {
                       )}
                     </div>
                   </th>
+                  {user?.role !== 'technicien' && (
                   <th>Actions</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -467,6 +494,7 @@ filtered.sort((a, b) => {
                 ) : (
                   currentAntennes.map((antenne) => (
                     <tr key={antenne._id}>
+                      {user?.role === 'admin' && (
                       <td className="checkbox-cell">
                         <input
                           type="checkbox"
@@ -475,6 +503,7 @@ filtered.sort((a, b) => {
                           className="antenne-crud-checkbox"
                         />
                       </td>
+                      )}
                       <td>
                         <span className={`antenne-crud-badge type-${antenne.type?.toLowerCase() || "autres"}`}>
                           {antenne.type}
@@ -494,6 +523,7 @@ filtered.sort((a, b) => {
                       </td>
                       <td>
                         <div className="antenne-crud-actions">
+                          {user?.role !== 'technicien' && (
                           <button
                             onClick={() => handleEditClick(antenne)}
                             className="antenne-crud-action-btn edit"
@@ -507,7 +537,8 @@ filtered.sort((a, b) => {
                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                               />
                             </svg>
-                          </button>
+                          </button>)}
+                          {user?.role === 'admin' && (
                           <button
                             onClick={() => handleDeleteClick(antenne._id)}
                             className="antenne-crud-action-btn delete"
@@ -522,6 +553,7 @@ filtered.sort((a, b) => {
                               />
                             </svg>
                           </button>
+                          )}
                         </div>
                       </td>
                     </tr>

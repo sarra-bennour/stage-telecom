@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import axios from "axios";
 import AddUpdateStation from "./addUpdateStation"
 import PopUp from "../partials/popup"
 import StationMap from "./stationMap"
@@ -8,6 +9,8 @@ import StationMap from "./stationMap"
 
 const StationList = () => {
   // State management
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [stationsData, setStationsData] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [filteredData, setFilteredData] = useState([])
@@ -31,6 +34,26 @@ const StationList = () => {
     isVisible: false,
   })
 
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/users/check-auth', {
+          withCredentials: true
+        });
+        console.log("userrrrr",response.data.data.user)
+        setUser(response.data.data?.user || null);
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+
   // Fetch stations from backend
   const fetchStations = async () => {
     try {
@@ -52,11 +75,23 @@ const StationList = () => {
       setLoading(false)
     }
   }
-
   // Load stations on component mount
   useEffect(() => {
     fetchStations()
   }, [])
+
+
+  // if (authLoading) {
+  //   return (
+  //     <div className="flex items-center justify-center min-h-screen">
+  //       <div className="text-center">
+  //         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+  //         <p className="mt-4 text-lg text-gray-600">Vérification des permissions...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
 
   const handleStationAdded = (newStation) => {
     // Ajouter la nouvelle station à la liste
@@ -663,6 +698,7 @@ const moveCarousel = (stationId, direction) => {
           <div className="bg-white p-3 rounded-xl border border-gray-100">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800">Stations ({filteredData.length})</h3>
+              {user?.role !== 'technicien' && (
               <button
                 onClick={() => setShowModal(true)}
                 style={{
@@ -696,6 +732,7 @@ const moveCarousel = (stationId, direction) => {
                 </svg>
                 Nouvelle Station
               </button>
+              )}
             </div>
 
             {filteredData.length === 0 ? (
@@ -751,6 +788,7 @@ const moveCarousel = (stationId, direction) => {
                     {/* Menu des trois points avec SVG */}
                     <div className="absolute top-2 right-2 z-10">
                       <div className="relative">
+                        {user?.role !== 'technicien' && (
                         <button
                           className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                           onClick={(e) => {
@@ -780,11 +818,13 @@ const moveCarousel = (stationId, direction) => {
                             <circle cx="12" cy="19" r="1"></circle>
                           </svg>
                         </button>
+                        )}
                         
                         {/* Menu déroulant avec SVG */}
                         {carouselStates[station._id]?.showMenu && (
                           <div className="absolute left-0 mt-1 w-40 bg-white rounded-md shadow-lg z-20 border border-gray-200">
                             <div className="py-1">
+                              {user?.role !== 'technicien' && (
                               <button
                                 className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                                 onClick={(e) => {
@@ -809,6 +849,8 @@ const moveCarousel = (stationId, direction) => {
                                 </svg>
                                 Modifier
                               </button>
+                              )}
+                              {user?.role === 'admin' && (
                               <button
                                 className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
                                 onClick={(e) => {
@@ -835,6 +877,7 @@ const moveCarousel = (stationId, direction) => {
                                 </svg>
                                 Supprimer
                               </button>
+                              )}
                             </div>
                           </div>
                         )}
