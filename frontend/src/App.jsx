@@ -8,6 +8,9 @@ import Signup from './user/signup';
 import ProtectedRoute from './partials/ProtectedRoute';
 import StationList from './station/stationList';
 import AntennesList from './antennes/antennesList';
+import TransmissionList from './transmissions/transmissionList';
+import DerangementList from './derangement/derangementList';
+import TicketList from './tickets/ticketList';
 
 function App() {
   return (
@@ -29,6 +32,21 @@ function App() {
           <Route path='/antenne-list' element={
             <ProtectedRoute>
               <AntennesList/>
+            </ProtectedRoute>
+          } />
+          <Route path='/transmission-list' element={
+            <ProtectedRoute>
+              <TransmissionList/>
+            </ProtectedRoute>
+          } />
+          <Route path='/derangement-list' element={
+            <ProtectedRoute>
+              <DerangementList/>
+            </ProtectedRoute>
+          } />
+          <Route path='/ticket-list' element={
+            <ProtectedRoute>
+              <TicketList/>
             </ProtectedRoute>
           } />
         </Route>

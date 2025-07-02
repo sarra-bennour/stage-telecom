@@ -1,15 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import axios from "axios";
+import axios from "axios"
 import AddAntenne from "./addAntenne"
 import PopUp from "../partials/popup"
 import "./antenne-crud.css"
 
 const AntennesList = () => {
   // State management
-  const [user, setUser] = useState(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [user, setUser] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
   const [antennesData, setAntennesData] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [filteredData, setFilteredData] = useState([])
@@ -34,20 +34,20 @@ const AntennesList = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/users/check-auth', {
-          withCredentials: true
-        });
-        console.log("userrrrr",response.data.data.user)
-        setUser(response.data.data?.user || null);
+        const response = await axios.get("http://localhost:3000/users/check-auth", {
+          withCredentials: true,
+        })
+        console.log("user", response.data.data.user)
+        setUser(response.data.data?.user || null)
       } catch (error) {
-        setUser(null);
+        setUser(null)
       } finally {
-        setAuthLoading(false);
+        setAuthLoading(false)
       }
-    };
+    }
 
-    checkAuth();
-  }, []);
+    checkAuth()
+  }, [])
 
   // Fetch antennes from backend
   const fetchAntennes = async () => {
@@ -153,24 +153,23 @@ const AntennesList = () => {
     })
 
     // Sort data
-    // Dans le useEffect qui gère le filtrage et le tri
-filtered.sort((a, b) => {
-  const getValue = (item, field) => {
-    if (field === "station") {
-      return item.station?.nom || "";
-    }
-    return item[field] || "";
-  };
+    filtered.sort((a, b) => {
+      const getValue = (item, field) => {
+        if (field === "station") {
+          return item.station?.nom || ""
+        }
+        return item[field] || ""
+      }
 
-  const aValue = String(getValue(a, sortField)).toLowerCase();
-  const bValue = String(getValue(b, sortField)).toLowerCase();
+      const aValue = String(getValue(a, sortField)).toLowerCase()
+      const bValue = String(getValue(b, sortField)).toLowerCase()
 
-  if (sortDirection === "asc") {
-    return aValue.localeCompare(bValue);
-  } else {
-    return bValue.localeCompare(aValue);
-  }
-});
+      if (sortDirection === "asc") {
+        return aValue.localeCompare(bValue)
+      } else {
+        return bValue.localeCompare(aValue)
+      }
+    })
 
     setFilteredData(filtered)
     setCurrentPage(1)
@@ -224,68 +223,54 @@ filtered.sort((a, b) => {
 
   return (
     <div className="antenne-crud">
-      <div className="antenne-crud-container">        
+      <div className="antenne-crud-container">
 
-{/* Stats Cards */}
-<div className="antenne-crud-stats">
-  <div className="antenne-crud-stat-card">
-    <div className="antenne-crud-stat-content">
-      <i className="fas fa-tower-cell" style={{
-        fontSize: '2.5rem',
-        color: '#4F46E5',
-        marginRight: '1rem'
-      }}></i>
-      <div className="antenne-crud-stat-info">
-        <dt className="antenne-crud-stat-label">Total</dt>
-        <dd className="antenne-crud-stat-value">{antennesData.length}</dd>
-      </div>
-    </div>
-  </div>
+        {/* Stats Cards - Version compacte */}
+        <div className="antenne-crud-stats-compact">
+          <div className="antenne-crud-stat-card-compact total">
+            <div className="antenne-crud-stat-icon-compact">
+              <i className="fas fa-tower-cell"></i>
+            </div>
+            <div className="antenne-crud-stat-info-compact">
+              <dt className="antenne-crud-stat-label-compact">Total Antennes</dt>
+              <dd className="antenne-crud-stat-value-compact">{antennesData.length}</dd>
+            </div>
+          </div>
 
-  <div className="antenne-crud-stat-card">
-    <div className="antenne-crud-stat-content">
-      <i className="fas fa-check-circle" style={{
-        fontSize: '2.5rem',
-        color: '#10B981',
-        marginRight: '1rem'
-      }}></i>
-      <div className="antenne-crud-stat-info">
-        <dt className="antenne-crud-stat-label">Actives</dt>
-        <dd className="antenne-crud-stat-value">{antennesData.filter((a) => a.etat === "actif").length}</dd>
-      </div>
-    </div>
-  </div>
+          <div className="antenne-crud-stat-card-compact active">
+            <div className="antenne-crud-stat-icon-compact">
+              <i className="fas fa-check-circle"></i>
+            </div>
+            <div className="antenne-crud-stat-info-compact">
+              <dt className="antenne-crud-stat-label-compact">Actives</dt>
+              <dd className="antenne-crud-stat-value-compact">
+                {antennesData.filter((a) => a.etat === "actif").length}
+              </dd>
+            </div>
+          </div>
 
-  <div className="antenne-crud-stat-card">
-    <div className="antenne-crud-stat-content">
-      <i className="fas fa-bolt" style={{
-        fontSize: '2.5rem',
-        color: '#F59E0B',
-        marginRight: '1rem'
-      }}></i>
-      <div className="antenne-crud-stat-info">
-        <dt className="antenne-crud-stat-label">5G</dt>
-        <dd className="antenne-crud-stat-value">{antennesData.filter((a) => a.type === "5G").length}</dd>
-      </div>
-    </div>
-  </div>
+          <div className="antenne-crud-stat-card-compact fiveg">
+            <div className="antenne-crud-stat-icon-compact">
+              <i className="fas fa-bolt"></i>
+            </div>
+            <div className="antenne-crud-stat-info-compact">
+              <dt className="antenne-crud-stat-label-compact">5G</dt>
+              <dd className="antenne-crud-stat-value-compact">{antennesData.filter((a) => a.type === "5G").length}</dd>
+            </div>
+          </div>
 
-  <div className="antenne-crud-stat-card">
-    <div className="antenne-crud-stat-content">
-      <i className="fas fa-tools" style={{
-        fontSize: '2.5rem',
-        color: '#EF4444',
-        marginRight: '1rem'
-      }}></i>
-      <div className="antenne-crud-stat-info">
-        <dt className="antenne-crud-stat-label">Maintenance</dt>
-        <dd className="antenne-crud-stat-value">
-          {antennesData.filter((a) => a.etat === "maintenance").length}
-        </dd>
-      </div>
-    </div>
-  </div>
-</div>
+          <div className="antenne-crud-stat-card-compact maintenance">
+            <div className="antenne-crud-stat-icon-compact">
+              <i className="fas fa-tools"></i>
+            </div>
+            <div className="antenne-crud-stat-info-compact">
+              <dt className="antenne-crud-stat-label-compact">Maintenance</dt>
+              <dd className="antenne-crud-stat-value-compact">
+                {antennesData.filter((a) => a.etat === "maintenance").length}
+              </dd>
+            </div>
+          </div>
+        </div>
 
         {/* Filters and Search */}
         <div className="antenne-crud-filters">
@@ -293,269 +278,319 @@ filtered.sort((a, b) => {
             <div className="antenne-crud-filters-content">
               <div className="antenne-crud-search-container">
                 <div className="antenne-crud-search-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
+                  <i className="fas fa-search"></i>
                 </div>
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="antenne-crud-search-input"
-                  placeholder="Rechercher une antenne..."
+                  placeholder="Rechercher par type, fournisseur ou station..."
                 />
+                {searchTerm && (
+                  <button onClick={() => setSearchTerm("")} className="antenne-crud-search-clear">
+                    <i className="fas fa-times"></i>
+                  </button>
+                )}
               </div>
 
               <div className="antenne-crud-filters-row">
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                  className="antenne-crud-select"
-                >
-                  <option value="">Tous les types</option>
-                  <option value="2G">2G</option>
-                  <option value="3G">3G</option>
-                  <option value="4G">4G</option>
-                  <option value="5G">5G</option>
-                  <option value="autres">Autres</option>
-                </select>
+                <div className="antenne-crud-filter-group">
+                  <label className="antenne-crud-filter-label">Type</label>
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    className="antenne-crud-select"
+                  >
+                    <option value="">Tous les types</option>
+                    <option value="2G">2G</option>
+                    <option value="3G">3G</option>
+                    <option value="4G">4G</option>
+                    <option value="5G">5G</option>
+                    <option value="autres">Autres</option>
+                  </select>
+                </div>
 
-                <select
-                  value={etatFilter}
-                  onChange={(e) => setEtatFilter(e.target.value)}
-                  className="antenne-crud-select"
-                >
-                  <option value="">Tous les états</option>
-                  <option value="actif">Actif</option>
-                  <option value="maintenance">Maintenance</option>
-                  <option value="inactif">Inactif</option>
-                </select>
+                <div className="antenne-crud-filter-group">
+                  <label className="antenne-crud-filter-label">État</label>
+                  <select
+                    value={etatFilter}
+                    onChange={(e) => setEtatFilter(e.target.value)}
+                    className="antenne-crud-select"
+                  >
+                    <option value="">Tous les états</option>
+                    <option value="actif">Actif</option>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="inactif">Inactif</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Bulk Actions */}
-          {selectedItems.length > 0 && user?.role === 'admin' && (
+          {selectedItems.length > 0 && user?.role === "admin" && (
             <div className="antenne-crud-bulk-actions">
-              <span className="antenne-crud-bulk-text">{selectedItems.length} élément(s) sélectionné(s)</span>
+              <div className="antenne-crud-bulk-info">
+                <i className="fas fa-check-square"></i>
+                <span className="antenne-crud-bulk-text">{selectedItems.length} élément(s) sélectionné(s)</span>
+              </div>
               <button onClick={handleBulkDelete} className="antenne-crud-bulk-delete-btn">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-                Supprimer
+                <i className="fas fa-trash"></i>
+                Supprimer la sélection
               </button>
             </div>
           )}
         </div>
 
-        <div style={{marginLeft:"980px" , marginBottom:"10px"}}>
-          {user?.role !== 'technicien' && (
-              <button
-                onClick={() => {
-                  setEditMode(false)
-                  setEditingAntenne(null)
-                  setShowModal(true)
-                }}
-                className="antenne-crud-add-btn"
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Nouvelle Antenne
-              </button>
-          )}
-            </div>
-
         {/* Table */}
         <div className="antenne-crud-table-container">
-          
+          <div className="antenne-crud-table-header">
+            <h3 className="antenne-crud-table-title">
+              <i className="fas fa-list"></i>
+              Liste des Antennes ({filteredData.length})
+            </h3>
+            <div className="antenne-crud-table-actions">
+              {user?.role !== "technicien" && (
+                <button
+                  onClick={() => {
+                    setEditMode(false)
+                    setEditingAntenne(null)
+                    setShowModal(true)
+                  }}
+                  className="antenne-crud-add-btn"
+                >
+                  <i className="fas fa-plus"></i>
+                  Nouvelle Antenne
+                </button>
+              )}
+              <button onClick={() => fetchAntennes()} className="antenne-crud-refresh-btn" title="Actualiser">
+                <i className="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+
           <div className="antenne-crud-table-wrapper">
             <table className="antenne-crud-table">
               <thead>
                 <tr>
-                  {user?.role === 'admin' && (
-                  <th className="checkbox-cell">
-                    <input
-                      type="checkbox"
-                      checked={selectedItems.length === currentAntennes.length && currentAntennes.length > 0}
-                      onChange={(e) => handleSelectAll(e.target.checked)}
-                      className="antenne-crud-checkbox"
-                    />
-                  </th>
+                  {user?.role === "admin" && (
+                    <th className="antenne-crud-checkbox-header">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.length === currentAntennes.length && currentAntennes.length > 0}
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        className="antenne-crud-checkbox"
+                      />
+                    </th>
                   )}
-                  <th className="sortable" onClick={() => handleSort("type")}>
-                    <div className="sort-header">
+                  <th className="antenne-crud-sortable" onClick={() => handleSort("type")}>
+                    <div className="antenne-crud-sort-header">
+                      <i className="fas fa-signal"></i>
                       <span>Type</span>
                       {sortField === "type" && (
-                        <svg
-                          className={`sort-icon ${sortDirection === "desc" ? "desc" : ""}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <i
+                          className={`fas fa-sort-${sortDirection === "desc" ? "down" : "up"} antenne-crud-sort-icon`}
+                        ></i>
                       )}
                     </div>
                   </th>
-                  <th className="sortable" onClick={() => handleSort("station")}>
-                    <div className="sort-header">
+                  <th className="antenne-crud-sortable" onClick={() => handleSort("station")}>
+                    <div className="antenne-crud-sort-header">
+                      <i className="fas fa-building"></i>
                       <span>Station</span>
                       {sortField === "station" && (
-                        <svg
-                          className={`sort-icon ${sortDirection === "desc" ? "desc" : ""}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <i
+                          className={`fas fa-sort-${sortDirection === "desc" ? "down" : "up"} antenne-crud-sort-icon`}
+                        ></i>
                       )}
                     </div>
                   </th>
-                  <th className="sortable" onClick={() => handleSort("frequence")}>
-                    <div className="sort-header">
+                  <th className="antenne-crud-sortable" onClick={() => handleSort("frequence")}>
+                    <div className="antenne-crud-sort-header">
+                      <i className="fas fa-wave-square"></i>
                       <span>Fréquence</span>
                       {sortField === "frequence" && (
-                        <svg
-                          className={`sort-icon ${sortDirection === "desc" ? "desc" : ""}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <i
+                          className={`fas fa-sort-${sortDirection === "desc" ? "down" : "up"} antenne-crud-sort-icon`}
+                        ></i>
                       )}
                     </div>
                   </th>
-                  <th className="sortable" onClick={() => handleSort("fournisseur")}>
-                    <div className="sort-header">
+                  <th className="antenne-crud-sortable" onClick={() => handleSort("fournisseur")}>
+                    <div className="antenne-crud-sort-header">
+                      <i className="fas fa-industry"></i>
                       <span>Fournisseur</span>
                       {sortField === "fournisseur" && (
-                        <svg
-                          className={`sort-icon ${sortDirection === "desc" ? "desc" : ""}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <i
+                          className={`fas fa-sort-${sortDirection === "desc" ? "down" : "up"} antenne-crud-sort-icon`}
+                        ></i>
                       )}
                     </div>
                   </th>
-                  <th className="sortable" onClick={() => handleSort("etat")}>
-                    <div className="sort-header">
+                  <th>
+                    <div className="antenne-crud-sort-header">
+                      <i className="fas fa-ruler-vertical"></i>
+                      <span>HBA</span>
+                    </div>
+                  </th>
+                  <th>
+                    <div className="antenne-crud-sort-header">
+                      <i className="fas fa-compass"></i>
+                      <span>Orientation</span>
+                    </div>
+                  </th>
+                  <th className="antenne-crud-sortable" onClick={() => handleSort("etat")}>
+                    <div className="antenne-crud-sort-header">
+                      <i className="fas fa-info-circle"></i>
                       <span>État</span>
                       {sortField === "etat" && (
-                        <svg
-                          className={`sort-icon ${sortDirection === "desc" ? "desc" : ""}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <i
+                          className={`fas fa-sort-${sortDirection === "desc" ? "down" : "up"} antenne-crud-sort-icon`}
+                        ></i>
                       )}
                     </div>
                   </th>
-                  {user?.role !== 'technicien' && (
-                  <th>Actions</th>
+                  {user?.role !== "technicien" && (
+                    <th>
+                      <div className="antenne-crud-sort-header">
+                        <i className="fas fa-cogs"></i>
+                        <span>Actions</span>
+                      </div>
+                    </th>
                   )}
                 </tr>
               </thead>
               <tbody>
                 {currentAntennes.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="antenne-crud-empty">
+                    <td colSpan="9" className="antenne-crud-empty">
                       <div className="antenne-crud-empty-content">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
-                          />
-                        </svg>
+                        <i className="fas fa-tower-cell antenne-crud-empty-icon"></i>
                         <p className="antenne-crud-empty-title">Aucune antenne trouvée</p>
-                        <p className="antenne-crud-empty-subtitle">Commencez par créer une nouvelle antenne</p>
+                        <p className="antenne-crud-empty-subtitle">
+                          {searchTerm || typeFilter || etatFilter
+                            ? "Aucun résultat ne correspond à vos critères de recherche"
+                            : "Commencez par créer une nouvelle antenne"}
+                        </p>
+                        {(searchTerm || typeFilter || etatFilter) && (
+                          <button
+                            onClick={() => {
+                              setSearchTerm("")
+                              setTypeFilter("")
+                              setEtatFilter("")
+                            }}
+                            className="antenne-crud-clear-filters"
+                          >
+                            <i className="fas fa-filter"></i>
+                            Effacer les filtres
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
                 ) : (
-                  currentAntennes.map((antenne) => (
-                    <tr key={antenne._id}>
-                      {user?.role === 'admin' && (
-                      <td className="checkbox-cell">
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.includes(antenne._id)}
-                          onChange={(e) => handleSelectItem(antenne._id, e.target.checked)}
-                          className="antenne-crud-checkbox"
-                        />
-                      </td>
+                  currentAntennes.map((antenne, index) => (
+                    <tr key={antenne._id} className="antenne-crud-table-row">
+                      {user?.role === "admin" && (
+                        <td className="antenne-crud-checkbox-cell">
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.includes(antenne._id)}
+                            onChange={(e) => handleSelectItem(antenne._id, e.target.checked)}
+                            className="antenne-crud-checkbox"
+                          />
+                        </td>
                       )}
                       <td>
-                        <span className={`antenne-crud-badge type-${antenne.type?.toLowerCase() || "autres"}`}>
-                          {antenne.type}
-                        </span>
+                        <div className="antenne-crud-type-cell">
+                          <span className={`antenne-crud-badge type-${antenne.type?.toLowerCase() || "autres"}`}>
+                            {antenne.type?.toUpperCase() || "AUTRES"}
+                          </span>
+                        </div>
                       </td>
-                      <td>{antenne.station?.nom || "N/A"}</td>
-                      <td>{antenne.frequence ? `${antenne.frequence} MHz` : "N/A"}</td>
-                      <td>{antenne.fournisseur || "N/A"}</td>
                       <td>
-                        <span className={`antenne-crud-badge etat-${antenne.etat}`}>
-                          {antenne.etat === "actif"
-                            ? "Actif"
-                            : antenne.etat === "maintenance"
-                              ? "Maintenance"
-                              : "Inactif"}
+                        <span className="antenne-crud-station-name">{antenne.station?.nom || "N/A"}</span>
+                      </td>
+                      <td>
+                        <span className="antenne-crud-frequency-value">
+                          {antenne.frequence ? `${antenne.frequence} MHz` : "N/A"}
                         </span>
                       </td>
                       <td>
-                        <div className="antenne-crud-actions">
-                          {user?.role !== 'technicien' && (
-                          <button
-                            onClick={() => handleEditClick(antenne)}
-                            className="antenne-crud-action-btn edit"
-                            title="Modifier"
-                          >
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                              />
-                            </svg>
-                          </button>)}
-                          {user?.role === 'admin' && (
-                          <button
-                            onClick={() => handleDeleteClick(antenne._id)}
-                            className="antenne-crud-action-btn delete"
-                            title="Supprimer"
-                          >
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                          </button>
+                        <span className="antenne-crud-supplier-name">{antenne.fournisseur || "N/A"}</span>
+                      </td>
+                      <td>
+                        <span className="antenne-crud-hba-value">{antenne.HBA ? `${antenne.HBA} m` : "N/A"}</span>
+                      </td>
+                      <td>
+                        <div className="antenne-crud-orientation-values">
+                          {antenne.tilt && (
+                            <span className="antenne-crud-orientation-item">
+                              <small>T:</small> {antenne.tilt}°
+                            </span>
+                          )}
+                          {antenne.azimut && (
+                            <span className="antenne-crud-orientation-item">
+                              <small>A:</small> {antenne.azimut}°
+                            </span>
+                          )}
+                          {!antenne.tilt && !antenne.azimut && <span>N/A</span>}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="antenne-crud-status-cell">
+                          <span className={`antenne-crud-badge etat-${antenne.etat}`}>
+                            <i
+                              className={`fas ${
+                                antenne.etat === "actif"
+                                  ? "fa-check-circle"
+                                  : antenne.etat === "maintenance"
+                                    ? "fa-tools"
+                                    : "fa-times-circle"
+                              }`}
+                            ></i>
+                            {antenne.etat === "actif"
+                              ? "ACTIF"
+                              : antenne.etat === "maintenance"
+                                ? "MAINTENANCE"
+                                : "INACTIF"}
+                          </span>
+                          {antenne.etat_serrage && (
+                            <span className="antenne-crud-badge-small serrage-ok">SERRAGE OK</span>
                           )}
                         </div>
                       </td>
+                      {user?.role !== "technicien" && (
+                        <td>
+                          <div className="antenne-crud-actions">
+                            <button
+                              onClick={() => handleEditClick(antenne)}
+                              className="antenne-crud-action-btn edit"
+                              title="Modifier l'antenne"
+                            >
+                              <i className="fas fa-edit"></i>
+                            </button>
+                            {user?.role === "admin" && (
+                              <button
+                                onClick={() => handleDeleteClick(antenne._id)}
+                                className="antenne-crud-action-btn delete"
+                                title="Supprimer l'antenne"
+                              >
+                                <i className="fas fa-trash"></i>
+                              </button>
+                            )}
+                            {antenne.observation && (
+                              <button
+                                className="antenne-crud-action-btn info"
+                                title={`Observation: ${antenne.observation}`}
+                              >
+                                <i className="fas fa-info-circle"></i>
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))
                 )}
@@ -566,63 +601,56 @@ filtered.sort((a, b) => {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="antenne-crud-pagination">
-              <div className="antenne-crud-pagination-mobile">
+              <div className="antenne-crud-pagination-info">
+                <span>
+                  Affichage de <strong>{startIndex + 1}</strong> à{" "}
+                  <strong>{Math.min(endIndex, filteredData.length)}</strong> sur <strong>{filteredData.length}</strong>{" "}
+                  antennes
+                </span>
+              </div>
+              <div className="antenne-crud-pagination-controls">
                 <button
                   onClick={() => currentPage > 1 && goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
                   className="antenne-crud-pagination-btn"
                 >
+                  <i className="fas fa-chevron-left"></i>
                   Précédent
                 </button>
+
+                <div className="antenne-crud-pagination-numbers">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNumber
+                    if (totalPages <= 5) {
+                      pageNumber = i + 1
+                    } else if (currentPage <= 3) {
+                      pageNumber = i + 1
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNumber = totalPages - 4 + i
+                    } else {
+                      pageNumber = currentPage - 2 + i
+                    }
+
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => goToPage(pageNumber)}
+                        className={`antenne-crud-pagination-btn ${pageNumber === currentPage ? "active" : ""}`}
+                      >
+                        {pageNumber}
+                      </button>
+                    )
+                  })}
+                </div>
+
                 <button
                   onClick={() => currentPage < totalPages && goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className="antenne-crud-pagination-btn"
                 >
                   Suivant
+                  <i className="fas fa-chevron-right"></i>
                 </button>
-              </div>
-              <div className="antenne-crud-pagination-desktop">
-                <div>
-                  <p className="antenne-crud-pagination-info">
-                    Affichage de <span className="font-medium">{startIndex + 1}</span> à{" "}
-                    <span className="font-medium">{Math.min(endIndex, filteredData.length)}</span> sur{" "}
-                    <span className="font-medium">{filteredData.length}</span> résultats
-                  </p>
-                </div>
-                <div>
-                  <nav className="antenne-crud-pagination-nav">
-                    <button
-                      onClick={() => currentPage > 1 && goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="antenne-crud-pagination-btn"
-                    >
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                      </svg>
-                    </button>
-
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => goToPage(page)}
-                        className={`antenne-crud-pagination-btn ${page === currentPage ? "active" : ""}`}
-                      >
-                        {page}
-                      </button>
-                    ))}
-
-                    <button
-                      onClick={() => currentPage < totalPages && goToPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="antenne-crud-pagination-btn"
-                    >
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </nav>
-                </div>
               </div>
             </div>
           )}

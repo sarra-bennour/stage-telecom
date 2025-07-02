@@ -110,11 +110,17 @@ passport.deserializeUser(async (id, done) => {
 const usersRouter = require('./routes/userRoute');
 const stationRouter = require('./routes/stationRoute');
 const antenneRouter = require('./routes/antenneRoute');
+const transmissionRouter = require('./routes/transmissionRoute');
+const derangementRouter = require('./routes/derangementRoute');
+const ticketRouter = require('./routes/ticketRoute');
 
 
 app.use('/users', usersRouter);
 app.use('/stations', stationRouter);
 app.use('/antennes', antenneRouter);
+app.use('/transmissions', transmissionRouter);
+app.use('/derangements', derangementRouter);
+app.use('/tickets', ticketRouter);
 
 
 // Middleware de vérification d'authentification

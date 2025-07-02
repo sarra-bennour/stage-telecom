@@ -155,3 +155,48 @@ exports.checkAuth = (req, res) => {
     message: 'Non authentifié'
   });
 };
+
+
+// Récupérer tous les superviseurs
+exports.getSuperviseurs = async (req, res) => {
+  try {
+    const superviseurs = await User.find({ role: 'superviseur' })
+      .select('-password') // Exclure le mot de passe
+      .sort({ nom: 1 }); // Trier par nom
+
+    res.status(200).json({
+      success: true,
+      message: 'Liste des superviseurs récupérée avec succès',
+      data: superviseurs
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des superviseurs:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la récupération des superviseurs',
+      error: error.message
+    });
+  }
+};
+
+// Récupérer tous les techniciens
+exports.getTechniciens = async (req, res) => {
+  try {
+    const techniciens = await User.find({ role: 'technicien' })
+      .select('-password') // Exclure le mot de passe
+      .sort({ nom: 1 }); // Trier par nom
+
+    res.status(200).json({
+      success: true,
+      message: 'Liste des techniciens récupérée avec succès',
+      data: techniciens
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des techniciens:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la récupération des techniciens',
+      error: error.message
+    });
+  }
+};

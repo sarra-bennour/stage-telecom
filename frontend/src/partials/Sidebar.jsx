@@ -67,20 +67,55 @@ const Sidebar = () =>{
         </NavLink>
       </li>
       <li className="mt-0.5 w-full">
-        <a className=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors" href="./pages/virtual-reality.html">
+        <NavLink
+            to="/transmission-list"
+            className={({ isActive }) =>
+              `py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg ${
+                isActive
+                  ? 'bg-blue-500/20 bg-blue-500/13 text-blue-700 font-semibold'
+                  : 'text-slate-700 dark:text-white dark:opacity-80'
+              }`
+            }
+          >
           <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
             <i class="relative top-0 text-xl leading-normal text-cyan-500 las la-signal"></i>
           </div>
           <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Transmissions</span>
-        </a>
+        </NavLink>
       </li>
       <li className="mt-0.5 w-full">
-        <a className=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors" href="./pages/rtl.html">
+        <NavLink
+            to="/derangement-list"
+            className={({ isActive }) =>
+              `py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg ${
+                isActive
+                  ? 'bg-blue-500/20 bg-blue-500/13 text-blue-700 font-semibold'
+                  : 'text-slate-700 dark:text-white dark:opacity-80'
+              }`
+            }
+          >
           <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-            <i className="relative top-0 text-sm leading-normal text-red-600 ni ni-world-2" />
+            <i className="relative top-0 text-xl leading-normal text-red-600 <i las la-exclamation-triangle" />
           </div>
           <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Dérangement</span>
-        </a>
+        </NavLink>
+      </li>
+      <li className="mt-0.5 w-full">
+        <NavLink
+            to="/ticket-list"
+            className={({ isActive }) =>
+              `py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg ${
+                isActive
+                  ? 'bg-blue-500/20 bg-blue-500/13 text-blue-700 font-semibold'
+                  : 'text-slate-700 dark:text-white dark:opacity-80'
+              }`
+            }
+          >
+          <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
+            <i className="relative top-0 text-xl leading-normal las la-ticket-alt" style={{ color: '#9b5de5' }}/>
+          </div>
+          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Tickets</span>
+        </NavLink>
       </li>
       <li className="w-full mt-4">
         <h6 className="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">Account pages</h6>
