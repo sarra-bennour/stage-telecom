@@ -6,31 +6,49 @@ const Navbar = () => {
 
     // Fonction pour obtenir le titre et le breadcrumb en fonction de la route
     const getPageInfo = () => {
-        switch (location.pathname) {
-            case '/dashboard':
-                return {
-                    breadcrumb: 'Dashboard',
-                    title: 'Dashboard',
-                    description: 'Vue d\'ensemble des statistiques et activités'
-                };
-            case '/station-list':
-                return {
-                    breadcrumb: 'Stations',
-                    title: 'Liste des Stations',
-                    description: 'Gérez et consultez toutes les stations disponibles'
-                };
-            case '/antenne-list':
-                return {
-                    breadcrumb: 'Antennes',
-                    title: 'Liste des Antennes',
-                    description: 'Gérez et consultez toutes les antennes disponibles'
-                };
-            default:
-                return {
-                    breadcrumb: 'Dashboard',
-                    title: 'Dashboard',
-                    description: 'Vue d\'ensemble des statistiques et activités'
-                };
+    switch (location.pathname) {
+        case '/dashboard':
+            return {
+                breadcrumb: 'Dashboard',
+                title: 'Dashboard',
+                description: 'Vue d\'ensemble des statistiques et activités'
+            };
+        case '/station-list':
+            return {
+                breadcrumb: 'Stations',
+                title: 'Liste des Stations',
+                description: 'Gérez et consultez toutes les stations disponibles'
+            };
+        case '/antenne-list':
+            return {
+                breadcrumb: 'Antennes',
+                title: 'Liste des Antennes',
+                description: 'Gérez et consultez toutes les antennes disponibles'
+            };
+        case '/transmission-list':
+            return {
+                breadcrumb: 'Transmissions',
+                title: 'Liste des Transmissions Physiques',
+                description: 'Gérez les infrastructures de transmission physique (fibre, faisceau, HDSL)'
+            };
+        case '/derangement-list':
+            return {
+                breadcrumb: 'Dérangement',
+                title: 'Liste des Dérangements',
+                description: 'Consultez et gérez les dérangements (pannes) déclarées dans les stations'
+            };
+        case '/ticket-list':
+            return {
+                breadcrumb: 'Tickets',
+                title: 'Liste des Tickets',
+                description: 'Déclarez et suivez les tickets de panne'
+            };
+        default:
+            return {
+                breadcrumb: 'Dashboard',
+                title: 'Dashboard',
+                description: 'Vue d\'ensemble des statistiques et activités'
+            };
         }
     };
 

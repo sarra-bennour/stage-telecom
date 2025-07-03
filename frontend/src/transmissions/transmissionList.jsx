@@ -126,6 +126,18 @@ const TransmissionList = () => {
     }
   }
 
+  const handleCardClick = (id) => {
+  if (user?.role !== "admin") return; // Seulement pour les admins
+  
+  setSelectedItems(prev => {
+    if (prev.includes(id)) {
+      return prev.filter(item => item !== id); // Désélectionne si déjà sélectionné
+    } else {
+      return [...prev, id]; // Sélectionne si non sélectionné
+    }
+  });
+};
+
   const handleSuccess = (message) => {
     setPopup({ type: "success", message: message, isVisible: true })
   }
@@ -138,7 +150,7 @@ const TransmissionList = () => {
     setPopup((prev) => ({ ...prev, isVisible: false }))
   }
 
-  const itemsPerPage = 10
+  const itemsPerPage = 4
 
   // Apply filters and search
   useEffect(() => {
@@ -391,19 +403,6 @@ const TransmissionList = () => {
           <div className="transmission-crud-cards-container">
             <div className="transmission-crud-cards-header">
               <h3 className="transmission-crud-cards-title">Transmissions ({filteredData.length})</h3>
-              <div className="transmission-crud-view-toggle">
-                <button className="transmission-crud-view-btn active">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                    />
-                  </svg>
-                  Cartes
-                </button>
-              </div>
             </div>
 
             {filteredData.length === 0 ? (
@@ -429,9 +428,29 @@ const TransmissionList = () => {
             ) : (
               <div className="transmission-crud-cards-grid">
                 {currentTransmissions.map((transmission) => (
-                  <div key={transmission._id} className="transmission-crud-card">
+                  <div 
+                    key={transmission._id} 
+                    className={`transmission-crud-card ${selectedItems.includes(transmission._id) ? 'selected' : ''}`}
+                    onClick={() => handleCardClick(transmission._id)}
+                  >
                     {/* Card Header */}
                     <div className="transmission-crud-card-header">
+                      {user?.role === "admin" && (
+                        <div 
+                          className="transmission-crud-card-checkbox" 
+                          onClick={(e) => e.stopPropagation()} // Empêche la propagation du clic
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.includes(transmission._id)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleSelectItem(transmission._id, e.target.checked);
+                            }}
+                            className="transmission-crud-hidden-checkbox"
+                          />
+                        </div>
+                      )}
                       <div className="transmission-crud-card-type">
                         <div
                           className={`transmission-crud-type-icon type-${transmission.type?.toLowerCase() || "autres"}`}

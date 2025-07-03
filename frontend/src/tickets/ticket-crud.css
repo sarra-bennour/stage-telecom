@@ -155,20 +155,8 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--ticket-primary), var(--ticket-info));
 }
 
-.ticket-crud-stat-card.danger::before {
-  background: linear-gradient(90deg, var(--ticket-danger), #ff6b6b);
-}
-
-.ticket-crud-stat-card.warning::before {
-  background: linear-gradient(90deg, var(--ticket-warning), #ffd93d);
-}
-
-.ticket-crud-stat-card.success::before {
-  background: linear-gradient(90deg, var(--ticket-success), #51cf66);
-}
 
 .ticket-crud-stat-card:hover {
   transform: translateY(-5px);
@@ -298,6 +286,7 @@
   border-radius: var(--ticket-radius);
   font-size: 16px;
   background: white;
+  color: #1e293b;
   cursor: pointer;
   transition: var(--ticket-transition);
   min-width: 150px;
@@ -754,7 +743,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, var(--ticket-primary), var(--ticket-info));
   color: white;
   border-radius: var(--ticket-radius) var(--ticket-radius) 0 0;
 }
@@ -767,6 +755,7 @@
 
 .ticket-modal-icon {
   font-size: 1.5rem;
+  color:#4f46e5;
 }
 
 .ticket-modal-title {
@@ -776,7 +765,7 @@
 }
 
 .ticket-modal-close-btn {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(102, 101, 101, 0.377);
   border: none;
   color: white;
   padding: 10px;
@@ -791,7 +780,7 @@
 }
 
 .ticket-modal-close-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background:  rgba(102, 101, 101, 0.652);
 }
 
 /* Form Styles */
@@ -1263,5 +1252,83 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+/* Stats compactes sur une ligne */
+.ticket-crud-stats.compact {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ticket-crud-stats.compact .ticket-crud-stat-card {
+  flex: 1;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.ticket-crud-stats.compact .ticket-crud-stat-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1rem;
+}
+
+.ticket-crud-stats.compact .ticket-crud-stat-value {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.ticket-crud-stats.compact .ticket-crud-stat-label {
+  font-size: 0.75rem;
+}
+
+.ticket-crud-stats.compact .ticket-crud-stat-trend {
+  display: none;
+}
+
+/* Section pour le bouton d'ajout */
+.ticket-crud-add-section {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-color);
+}
+
+.ticket-crud-add-section .ticket-crud-add-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-crud-add-section .ticket-crud-add-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive pour les stats compactes */
+@media (max-width: 768px) {
+  .ticket-crud-stats.compact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .ticket-crud-add-section {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .ticket-crud-stats.compact {
+    grid-template-columns: 1fr;
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
-import AddTicket from "./addTicket"
+import AddTicket from "./AddTicket"
 import PopUp from "../partials/popup"
 import "./ticket-crud.css"
 
@@ -115,7 +115,7 @@ const TicketList = () => {
     setPopup((prev) => ({ ...prev, isVisible: false }))
   }
 
-  const itemsPerPage = 9
+  const itemsPerPage = 4
 
   // Apply filters and search
   useEffect(() => {
@@ -180,15 +180,19 @@ const TicketList = () => {
     }
   }
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  }
+  const formatDate = (date) => {
+  const originalDate = new Date(date)
+  // Add 1 hour
+  originalDate.setHours(originalDate.getHours() + 1)
+  
+  return originalDate.toLocaleDateString("fr-FR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
 
   const getDaysOpen = (dateCreation) => {
     const now = new Date()
@@ -212,42 +216,16 @@ const TicketList = () => {
   return (
     <div className="ticket-crud">
       <div className="ticket-crud-container">
-        {/* Header */}
-        <div className="ticket-crud-header">
-          <div className="ticket-crud-header-content">
-            <div className="ticket-crud-header-info">
-              <h1 className="ticket-crud-title">
-                <i className="fas fa-ticket-alt ticket-crud-title-icon"></i>
-                Gestion des Tickets
-              </h1>
-              <p className="ticket-crud-subtitle">Suivez et gérez tous les tickets de panne et maintenance</p>
-            </div>
-            <button
-              onClick={() => {
-                setEditMode(false)
-                setEditingTicket(null)
-                setShowModal(true)
-              }}
-              className="ticket-crud-add-btn"
-            >
-              <i className="fas fa-plus"></i>
-              Nouveau Ticket
-            </button>
-          </div>
-        </div>
 
-        {/* Stats Dashboard */}
-        <div className="ticket-crud-stats">
+        {/* Stats Dashboard - Compact */}
+        <div className="ticket-crud-stats compact">
           <div className="ticket-crud-stat-card total">
             <div className="ticket-crud-stat-icon">
               <i className="fas fa-ticket-alt"></i>
             </div>
             <div className="ticket-crud-stat-info">
               <h3 className="ticket-crud-stat-value">{ticketsData.length}</h3>
-              <p className="ticket-crud-stat-label">Total Tickets</p>
-            </div>
-            <div className="ticket-crud-stat-trend">
-              <i className="fas fa-chart-line"></i>
+              <p className="ticket-crud-stat-label">Total</p>
             </div>
           </div>
 
@@ -259,9 +237,6 @@ const TicketList = () => {
               <h3 className="ticket-crud-stat-value">{ticketsData.filter((t) => t.statut === "ouvert").length}</h3>
               <p className="ticket-crud-stat-label">Ouverts</p>
             </div>
-            <div className="ticket-crud-stat-trend">
-              <i className="fas fa-arrow-up"></i>
-            </div>
           </div>
 
           <div className="ticket-crud-stat-card warning">
@@ -272,9 +247,6 @@ const TicketList = () => {
               <h3 className="ticket-crud-stat-value">{ticketsData.filter((t) => t.statut === "en_cours").length}</h3>
               <p className="ticket-crud-stat-label">En Cours</p>
             </div>
-            <div className="ticket-crud-stat-trend">
-              <i className="fas fa-minus"></i>
-            </div>
           </div>
 
           <div className="ticket-crud-stat-card success">
@@ -284,9 +256,6 @@ const TicketList = () => {
             <div className="ticket-crud-stat-info">
               <h3 className="ticket-crud-stat-value">{ticketsData.filter((t) => t.statut === "résolu").length}</h3>
               <p className="ticket-crud-stat-label">Résolus</p>
-            </div>
-            <div className="ticket-crud-stat-trend">
-              <i className="fas fa-arrow-down"></i>
             </div>
           </div>
         </div>
@@ -323,6 +292,21 @@ const TicketList = () => {
           </div>
         </div>
 
+        {/* Add Button */}
+        <div className="ticket-crud-add-section">
+          <button
+            onClick={() => {
+              setEditMode(false)
+              setEditingTicket(null)
+              setShowModal(true)
+            }}
+            className="ticket-crud-add-btn"
+          >
+            <i className="fas fa-plus"></i>
+            Nouveau Ticket
+          </button>
+        </div>
+
         {/* Tickets Display */}
         <div className="ticket-crud-content">
           {currentTickets.length === 0 ? (
@@ -346,7 +330,7 @@ const TicketList = () => {
                     <div className="ticket-crud-ticket-perforation"></div>
                     <div className="ticket-crud-ticket-number">
                       <span className="ticket-crud-ticket-label">TICKET N°</span>
-                      <span className="ticket-crud-ticket-id">#{ticket._id.slice(-6).toUpperCase()}</span>
+                      <span className="ticket-crud-ticket-id">#{ticket.num_ticket}</span>
                     </div>
                     <div className="ticket-crud-ticket-status">
                       <span className={`ticket-crud-status-stamp ${getStatusColor(ticket.statut)}`}>
@@ -375,11 +359,11 @@ const TicketList = () => {
                       <div className="ticket-crud-ticket-row">
                         <div className="ticket-crud-ticket-field">
                           <span className="ticket-crud-field-label">SUPERVISEUR:</span>
-                          <span className="ticket-crud-field-value">{ticket.superviseur_id}</span>
+                          <span className="ticket-crud-field-value">{ticket.superviseur_id.nom} {ticket.superviseur_id.prenom}</span>
                         </div>
                         <div className="ticket-crud-ticket-field">
                           <span className="ticket-crud-field-label">TECHNICIEN:</span>
-                          <span className="ticket-crud-field-value">{ticket.technicien_id}</span>
+                          <span className="ticket-crud-field-value">{ticket.technicien_id.nom} {ticket.technicien_id.prenom}</span>
                         </div>
                       </div>
                     </div>
@@ -420,7 +404,7 @@ const TicketList = () => {
                         <span></span>
                         <span></span>
                       </div>
-                      <span className="ticket-crud-barcode-text">{ticket._id}</span>
+                      
                     </div>
                     <div className="ticket-crud-ticket-actions">
                       <button

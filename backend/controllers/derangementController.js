@@ -25,7 +25,10 @@ exports.createDerangement = async (req, res) => {
 exports.getDerangementList = async (req, res) => {
   try {
     const derangements = await Derangement.find()
-      .populate('ticket', 'numero titre statut') // Populate ticket info
+      .populate({
+        path: 'ticket',
+        select: 'num_ticket statut' // Spécifiez explicitement les champs à peupler
+      })
       .sort({ date_occurrence: -1 });
     
     res.status(200).json({

@@ -1,7 +1,6 @@
 /* Derangement History Styles */
 .derangement-history {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -154,9 +153,9 @@
 
 .derangement-history-select:focus,
 .derangement-history-date-input:focus {
-  border-color: #3b82f6;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+  border-color: var(--ticket-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .derangement-history-select {
@@ -742,8 +741,9 @@
 .derangement-history-sort-btn:focus-visible,
 .derangement-history-clear-filters:focus-visible,
 .derangement-history-pagination-btn:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--ticket-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 /* Print styles */
@@ -1372,4 +1372,34 @@
   border-color: #10b981;
   background-color: #f0fdf4;
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+/* Ajouter une nouvelle section pour le bouton d'ajout de dérangement : */
+.derangement-history-add-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.derangement-history-add-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.derangement-history-add-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

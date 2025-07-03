@@ -23,7 +23,7 @@ const DerangementList = () => {
   const [editMode, setEditMode] = useState(false)
 
   // Pagination
-  const itemsPerPage = 15
+  const itemsPerPage = 4
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -379,10 +379,14 @@ const DerangementList = () => {
                             </div>
                             <div className="derangement-history-item-time">
                               <i className="fas fa-clock"></i>
-                              {new Date(derangement.date_occurrence).toLocaleTimeString("fr-FR", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
+                              {(() => {
+                                const date = new Date(derangement.date_occurrence)
+                                date.setHours(date.getHours() + 1)
+                                return date.toLocaleTimeString("fr-FR", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              })()}
                             </div>
                           </div>
 
@@ -394,7 +398,7 @@ const DerangementList = () => {
                             <div className="derangement-history-item-footer">
                               <div className="derangement-history-item-ticket">
                                 <i className="fas fa-ticket-alt"></i>
-                                  <span>Ticket: {derangement.ticket?.numero || derangement.ticket?._id || 'N/A'}</span>
+                                  <span>Ticket: {derangement.ticket?.num_ticket || 'N/A'}</span>
                               </div>
                               <div className="derangement-history-item-created">
                                 <i className="fas fa-plus-circle"></i>

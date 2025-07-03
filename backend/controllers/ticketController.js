@@ -24,7 +24,7 @@ exports.createTicket = async (req, res) => {
 // Obtenir la liste des tickets
 exports.getTicketList = async (req, res) => {
   try {
-    const tickets = await Ticket.find().sort({ date_creation: -1 });
+    const tickets = await Ticket.find().sort({ date_creation: -1 }).populate('superviseur_id technicien_id' , 'nom prenom');;
     
     res.status(200).json({
       success: true,
@@ -110,7 +110,7 @@ exports.deleteTicket = async (req, res) => {
 exports.getTicketById = async (req, res) => {
   try {
     const { id } = req.params;
-    const ticket = await Ticket.findById(id);
+    const ticket = await Ticket.findById(id).populate('superviseur_id technicien_id');
 
     if (!ticket) {
       return res.status(404).json({

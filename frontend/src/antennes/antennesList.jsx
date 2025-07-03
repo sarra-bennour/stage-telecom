@@ -138,7 +138,7 @@ const AntennesList = () => {
     setPopup((prev) => ({ ...prev, isVisible: false }))
   }
 
-  const itemsPerPage = 10
+  const itemsPerPage = 6
 
   // Apply filters and search
   useEffect(() => {
@@ -364,9 +364,6 @@ const AntennesList = () => {
                   Nouvelle Antenne
                 </button>
               )}
-              <button onClick={() => fetchAntennes()} className="antenne-crud-refresh-btn" title="Actualiser">
-                <i className="fas fa-sync-alt"></i>
-              </button>
             </div>
           </div>
 
@@ -428,10 +425,15 @@ const AntennesList = () => {
                       )}
                     </div>
                   </th>
-                  <th>
+                  <th className="antenne-crud-sortable" onClick={() => handleSort("HBA")}>
                     <div className="antenne-crud-sort-header">
                       <i className="fas fa-ruler-vertical"></i>
                       <span>HBA</span>
+                      {sortField === "HBA" && (
+                        <i
+                          className={`fas fa-sort-${sortDirection === "desc" ? "down" : "up"} antenne-crud-sort-icon`}
+                        ></i>
+                      )}
                     </div>
                   </th>
                   <th>
