@@ -1,0 +1,633 @@
+:root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --secondary-color: #6366f1;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --border-radius: 0.75rem;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.user-crud {
+    min-height: 100vh;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, var(--gray-50), #e0e7ff 100%);
+}
+
+.user-crud-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Stats */
+.user-crud-stats-compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.user-crud-stat-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-crud-stat-icon-compact {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.user-crud-stat-card.admin .user-crud-stat-icon-compact {
+    background: linear-gradient(135deg, var(--primary-color), #6366f1);
+}
+
+.user-crud-stat-card.superviseur .user-crud-stat-icon-compact {
+    background: linear-gradient(135deg, #6366f1, #3b82f6);
+}
+
+.user-crud-stat-card.technicien .user-crud-stat-icon-compact {
+    background: linear-gradient(135deg, #10b981, #3b82f6);
+}
+
+.user-crud-stat-info-compact {
+    flex: 1;
+}
+
+.user-crud-stat-label-compact {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.user-crud-stat-value-compact {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+/* Filtres et recherche */
+.user-crud-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.user-crud-search-container {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+}
+
+.user-crud-search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.user-crud-search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    background: white;
+    color: var(--gray-900);
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.user-crud-search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.user-crud-select {
+    min-width: 160px;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    background: white;
+    color: var(--gray-900);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+}
+
+.user-crud-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.user-crud-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+}
+
+.user-crud-add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, var(--primary-hover), #5b21b6);
+}
+
+/* Table utilisateurs */
+.user-crud-table-container {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.user-crud-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.user-crud-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 2px solid var(--gray-200);
+    white-space: nowrap;
+    background: linear-gradient(135deg, var(--gray-50), #f8fafc);
+}
+
+.user-crud-table td {
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    color: var(--gray-900);
+    vertical-align: middle;
+}
+
+.user-crud-loading,
+.user-crud-error,
+.user-crud-empty {
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 1rem;
+    padding: 2rem 0;
+}
+
+/* Badges de rôle */
+.user-crud-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-200);
+}
+
+.user-crud-badge.role-admin {
+    background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+    color: #7c3aed;
+    border: 1px solid #d8b4fe;
+}
+
+.user-crud-badge.role-superviseur {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #2563eb;
+    border: 1px solid #93c5fd;
+}
+
+.user-crud-badge.role-technicien {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: #16a34a;
+    border: 1px solid #86efac;
+}
+
+/* Actions */
+.user-crud-action-btn {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.25rem;
+    font-size: 1rem;
+}
+
+.user-crud-action-btn.edit {
+    color: var(--primary-color);
+    background: rgba(79, 70, 229, 0.1);
+}
+
+.user-crud-action-btn.edit:hover {
+    background: rgba(79, 70, 229, 0.2);
+    transform: scale(1.1);
+}
+
+.user-crud-action-btn.delete {
+    color: var(--danger-color);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.user-crud-action-btn.delete:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: scale(1.1);
+}
+
+.user-crud-action-btn.save {
+    color: var(--success-color);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.user-crud-action-btn.save:hover {
+    background: rgba(16, 185, 129, 0.2);
+    transform: scale(1.1);
+}
+
+.user-crud-action-btn.cancel {
+    color: var(--gray-500);
+    background: rgba(156, 163, 175, 0.1);
+}
+
+.user-crud-action-btn.cancel:hover {
+    background: rgba(156, 163, 175, 0.2);
+    transform: scale(1.1);
+}
+
+.user-crud-action-btn.approve {
+    color: var(--success-color);
+    background: rgba(16, 185, 129, 0.1);
+    font-size: 0.9rem;
+    margin-right: 0.5rem;
+}
+
+.user-crud-action-btn.reject {
+    color: var(--danger-color);
+    background: rgba(239, 68, 68, 0.1);
+    font-size: 0.9rem;
+}
+
+/* Pagination */
+.user-crud-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.user-crud-pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    background: white;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 2.5rem;
+    justify-content: center;
+}
+
+.user-crud-pagination-btn:hover:not(:disabled) {
+    background: var(--gray-50);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.user-crud-pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Modals */
+.user-crud-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    animation: fadeInOverlay 0.3s ease-out;
+}
+
+@keyframes fadeInOverlay {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.user-crud-modal {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid var(--gray-200);
+    animation: slideInModal 0.3s ease-out;
+}
+
+@keyframes slideInModal {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.user-crud-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    background: linear-gradient(135deg, var(--gray-50), white);
+}
+
+.user-crud-modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-crud-modal-close {
+    color: var(--gray-500);
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-crud-modal-close:hover {
+    background: white;
+    color: var(--gray-700);
+    transform: scale(1.05);
+}
+
+.user-crud-modal-form {
+    padding: 1.5rem;
+}
+
+.user-crud-modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.user-crud-modal-form input,
+.user-crud-modal-form select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    background: white;
+    color: var(--gray-900);
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.user-crud-modal-form input:focus,
+.user-crud-modal-form select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.user-crud-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.user-crud-modal-cancel {
+    color: var(--gray-600);
+    background: white;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-crud-modal-cancel:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+    color: var(--gray-700);
+    transform: translateY(-1px);
+}
+
+.user-crud-modal-submit {
+    color: white;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+}
+
+.user-crud-modal-submit:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--primary-hover), #5b21b6);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.user-crud-modal-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Notifications de suppression */
+.user-crud-notif-section {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    margin-top: 2rem;
+    padding: 1.5rem;
+}
+
+.user-crud-notif-section h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-crud-notif-empty {
+    color: var(--gray-500);
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.user-crud-notif-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.user-crud-notif-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.user-crud-notif-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: var(--gray-800);
+}
+
+.user-crud-notif-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Success & Error */
+.user-crud-success {
+    color: var(--success-color);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
+.user-crud-error {
+    color: var(--danger-color);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .user-crud-stats-compact {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .user-crud-modal {
+        max-width: 98vw;
+    }
+}
+
+@media (max-width: 600px) {
+    .user-crud-stats-compact {
+        grid-template-columns: 1fr;
+    }
+
+    .user-crud-modal-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .user-crud-table th,
+    .user-crud-table td {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .user-crud-modal-header,
+    .user-crud-modal-form {
+        padding: 1rem;
+    }
+}

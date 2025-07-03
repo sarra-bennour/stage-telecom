@@ -11,6 +11,7 @@ import AntennesList from './antennes/antennesList';
 import TransmissionList from './transmissions/transmissionList';
 import DerangementList from './derangement/derangementList';
 import TicketList from './tickets/ticketList';
+import UserList from './user/userList';
 
 function App() {
   return (
@@ -19,6 +20,11 @@ function App() {
         <Route path='/' element={<Login/>} />
         <Route path='/signup' element={<Signup/>} />
         <Route element={<Layout />}>
+        <Route path='/user-list' element={
+            <ProtectedRoute>
+              <UserList/>
+            </ProtectedRoute>
+          } />
           <Route path='/dashboard' element={
             <ProtectedRoute>
               <Dashboard/>

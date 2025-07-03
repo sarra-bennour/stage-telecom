@@ -398,8 +398,7 @@ const DerangementList = () => {
                             <div className="derangement-history-item-footer">
                               <div className="derangement-history-item-ticket">
                                 <i className="fas fa-ticket-alt"></i>
-                                  <span>Ticket: {derangement.ticket?.num_ticket || 'N/A'}</span>
-                              </div>
+                                <span>Ticket: {derangement.ticket?.num_ticket ? `#${derangement.ticket.num_ticket}` : 'N/A'}</span>                              </div>
                               <div className="derangement-history-item-created">
                                 <i className="fas fa-plus-circle"></i>
                                 <span>Créé le {formatDate(derangement.createdAt)}</span>
