@@ -58,9 +58,6 @@ exports.signup = async (req, res) => {
   }
 };
 
-
-
-
 exports.login = async (req, res, next) => {
   const { email, password, rememberMe, recaptchaToken } = req.body;
 
@@ -237,6 +234,42 @@ exports.getAllUsers = async (req, res) => {
     });
   }
 };
+
+
+exports.addUser = async (req, res) => {
+  try {
+    const { nom, prenom, email, password, role, tel, recaptchaToken } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const user = await User.create({
+      nom,
+      prenom,
+      email,
+      password: hashedPassword,
+      role,
+      tel
+    });
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        user: {
+          id: user._id,
+          nom: user.nom,
+          email: user.email,
+          role: user.role
+        }
+      }
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err.message
+    });
+  }
+};
+
 
 // Modifier le rôle d'un utilisateur avec vérifications
 exports.updateUserRole = async (req, res) => {

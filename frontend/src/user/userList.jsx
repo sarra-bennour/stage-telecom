@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "./user.css";
+import PopUp from "../partials/popup";
 
 const roles = [ "superviseur", "technicien"];
+
 
 const UserList = () => {
     // State
@@ -16,16 +18,11 @@ const UserList = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [addForm, setAddForm] = useState({ nom: "", prenom: "", email: "", password: "", role: "technicien", tel: "" });
     const [addLoading, setAddLoading] = useState(false);
-    const [addError, setAddError] = useState("");
-    const [addSuccess, setAddSuccess] = useState("");
     const [editUserId, setEditUserId] = useState(null);
     const [editRole, setEditRole] = useState("");
     const [editLoading, setEditLoading] = useState(false);
-    const [editError, setEditError] = useState("");
     const [deleteUserId, setDeleteUserId] = useState(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
-    const [deleteError, setDeleteError] = useState("");
-    const [deleteSuccess, setDeleteSuccess] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
 
@@ -38,6 +35,24 @@ const UserList = () => {
     const [notifError, setNotifError] = useState("");
     const [notifSuccess, setNotifSuccess] = useState("");
 
+    const [popup, setPopup] = useState({
+        type: "",
+        message: "",
+        isVisible: false,
+    });
+
+
+    const handleSuccess = (message) => {
+    setPopup({ type: "success", message: message, isVisible: true });
+    };
+
+    const handleError = (message) => {
+        setPopup({ type: "error", message: message, isVisible: true });
+    };
+
+    const closePopup = () => {
+        setPopup(prev => ({ ...prev, isVisible: false }));
+    };
     useEffect(() => {
         const checkAuth = async () => {
             try {
@@ -95,19 +110,19 @@ const UserList = () => {
     const handleAddUser = async (e) => {
         e.preventDefault();
         setAddLoading(true);
-        setAddError("");
-        setAddSuccess("");
+        handleError("");
+        handleSuccess("");
         try {
             // Remplacer par l'endpoint réel
-            await axios.post("http://localhost:3000/users/signup", addForm);
-            setAddSuccess("Utilisateur ajouté avec succès");
+            await axios.post("http://localhost:3000/users/create-user", addForm);
+            handleSuccess("Utilisateur ajouté avec succès");
             setShowAddModal(false);
             setAddForm({ nom: "", prenom: "", email: "", password: "", role: "technicien", tel: "" });
             // Refresh list
             const res = await axios.get("http://localhost:3000/users/users-list", { withCredentials: true });
             setUsers(res.data.data.users || []);
         } catch (err) {
-            setAddError("Erreur lors de l'ajout de l'utilisateur");
+            handleError("Erreur lors de l'ajout de l'utilisateur");
         } finally {
             setAddLoading(false);
         }
@@ -116,7 +131,7 @@ const UserList = () => {
     // Edit role
     const handleEditRole = async (userId) => {
         setEditLoading(true);
-        setEditError("");
+        handleError("");
         try {
             await axios.put(`http://localhost:3000/users/update-role/${userId}`, 
                 { 
@@ -129,7 +144,7 @@ const UserList = () => {
             const res = await axios.get("http://localhost:3000/users/users-list", { withCredentials: true });
             setUsers(res.data.data.users || []);
         } catch (err) {
-            setEditError(err.response?.data?.message || "Erreur lors de la modification du rôle");
+            handleError(err.response?.data?.message || "Erreur lors de la modification du rôle");
         } finally {
             setEditLoading(false);
         }
@@ -138,18 +153,18 @@ const UserList = () => {
     // Delete user
     const handleDeleteUser = async (userId) => {
         setDeleteLoading(true);
-        setDeleteError("");
-        setDeleteSuccess("");
+        handleError("");
+        handleSuccess("");
         try {
             // Remplacer par l'endpoint réel
             await axios.delete(`http://localhost:3000/users/delete/${userId}`);
-            setDeleteSuccess("Utilisateur supprimé avec succès");
+            handleSuccess("Utilisateur supprimé avec succès");
             setDeleteUserId(null);
             // Refresh list
             const res = await axios.get("http://localhost:3000/users/users-list", { withCredentials: true });
             setUsers(res.data.data.users || []);
         } catch (err) {
-            setDeleteError("Erreur lors de la suppression de l'utilisateur");
+            handleError("Erreur lors de la suppression de l'utilisateur");
         } finally {
             setDeleteLoading(false);
         }
@@ -299,7 +314,6 @@ const UserList = () => {
                                                     <button className="user-crud-action-btn cancel" onClick={() => setEditUserId(null)}>
                                                         <i className="fas fa-times"></i>
                                                     </button>
-                                                    {editError && <span className="user-crud-error">{editError}</span>}
                                                 </>
                                             ) : (
                                                 <>
@@ -351,8 +365,7 @@ const UserList = () => {
                                         {roles.map(r => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
                                     </select>
                                 </div>
-                                {addError && <div className="user-crud-error">{addError}</div>}
-                                {addSuccess && <div className="user-crud-success">{addSuccess}</div>}
+                                
                                 <div className="user-crud-modal-actions">
                                     <button type="button" className="user-crud-modal-cancel" onClick={() => setShowAddModal(false)}>Annuler</button>
                                     <button type="submit" className="user-crud-modal-submit" disabled={addLoading}>{addLoading ? "Ajout..." : "Ajouter"}</button>
@@ -372,8 +385,6 @@ const UserList = () => {
                             </div>
                             <div className="user-crud-modal-body">
                                 Êtes-vous sûr de vouloir supprimer cet utilisateur ?
-                                {deleteError && <div className="user-crud-error">{deleteError}</div>}
-                                {deleteSuccess && <div className="user-crud-success">{deleteSuccess}</div>}
                             </div>
                             <div className="user-crud-modal-actions">
                                 <button className="user-crud-modal-cancel" onClick={() => setDeleteUserId(null)}>Annuler</button>
@@ -408,7 +419,9 @@ const UserList = () => {
                     )}
                 </div>
             </div>
-        </div>
+            {/* PopUp */}
+            <PopUp type={popup.type} message={popup.message} isVisible={popup.isVisible} onClose={closePopup} />
+        </div> 
     );
 };
 
