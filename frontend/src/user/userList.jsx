@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "./user.css";
 
-const roles = ["admin", "superviseur", "technicien"];
+const roles = [ "superviseur", "technicien"];
 
 const UserList = () => {
     // State
     const [users, setUsers] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [authLoading, setAuthLoading] = useState(true);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
@@ -36,6 +38,22 @@ const UserList = () => {
     const [notifError, setNotifError] = useState("");
     const [notifSuccess, setNotifSuccess] = useState("");
 
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await axios.get("http://localhost:3000/users/check-auth", {
+                    withCredentials: true,
+                });
+                setCurrentUser(response.data.data?.user || null);
+            } catch (error) {
+                setCurrentUser(null);
+            } finally {
+                setAuthLoading(false);
+            }
+        };
+        checkAuth();
+    }, []);
+
     // Fetch users
     useEffect(() => {
         const fetchUsers = async () => {
@@ -43,8 +61,8 @@ const UserList = () => {
             setError("");
             try {
                 // Remplacer par l'endpoint réel pour récupérer tous les utilisateurs
-                const res = await axios.get("http://localhost:3000/users/list", { withCredentials: true });
-                setUsers(res.data.data || []);
+                const res = await axios.get("http://localhost:3000/users/users-list", { withCredentials: true });
+                setUsers(res.data.data.users || []);
             } catch (err) {
                 setError("Erreur lors du chargement des utilisateurs");
             } finally {
@@ -86,8 +104,8 @@ const UserList = () => {
             setShowAddModal(false);
             setAddForm({ nom: "", prenom: "", email: "", password: "", role: "technicien", tel: "" });
             // Refresh list
-            const res = await axios.get("http://localhost:3000/users/list", { withCredentials: true });
-            setUsers(res.data.data || []);
+            const res = await axios.get("http://localhost:3000/users/users-list", { withCredentials: true });
+            setUsers(res.data.data.users || []);
         } catch (err) {
             setAddError("Erreur lors de l'ajout de l'utilisateur");
         } finally {
@@ -100,15 +118,18 @@ const UserList = () => {
         setEditLoading(true);
         setEditError("");
         try {
-            // Remplacer par l'endpoint réel
-            await axios.patch(`http://localhost:3000/users/update-role/${userId}`, { role: editRole });
+            await axios.put(`http://localhost:3000/users/update-role/${userId}`, 
+                { 
+                    role: editRole, 
+                    currentUserId: currentUser?._id 
+                });
             setEditUserId(null);
             setEditRole("");
             // Refresh list
-            const res = await axios.get("http://localhost:3000/users/list", { withCredentials: true });
-            setUsers(res.data.data || []);
+            const res = await axios.get("http://localhost:3000/users/users-list", { withCredentials: true });
+            setUsers(res.data.data.users || []);
         } catch (err) {
-            setEditError("Erreur lors de la modification du rôle");
+            setEditError(err.response?.data?.message || "Erreur lors de la modification du rôle");
         } finally {
             setEditLoading(false);
         }
@@ -125,8 +146,8 @@ const UserList = () => {
             setDeleteSuccess("Utilisateur supprimé avec succès");
             setDeleteUserId(null);
             // Refresh list
-            const res = await axios.get("http://localhost:3000/users/list", { withCredentials: true });
-            setUsers(res.data.data || []);
+            const res = await axios.get("http://localhost:3000/users/users-list", { withCredentials: true });
+            setUsers(res.data.data.users || []);
         } catch (err) {
             setDeleteError("Erreur lors de la suppression de l'utilisateur");
         } finally {

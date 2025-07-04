@@ -200,3 +200,135 @@ exports.getTechniciens = async (req, res) => {
     });
   }
 };
+
+// Récupérer tous les utilisateurs (sauf admin) avec restrictions de rôle
+exports.getAllUsers = async (req, res) => {
+  try {
+    // Vérifier si l'utilisateur est un superviseur
+    if (req.user.role === 'superviseur') {
+      // Pour les superviseurs, ne retourner que les techniciens
+      const users = await User.find({ role: 'technicien' })
+        .select('-password')
+        .sort({ nom: 1 });
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          users
+        }
+      });
+    }
+
+    // Pour les admins, retourner tous les utilisateurs sauf les autres admins
+    const users = await User.find({ role: { $ne: 'admin' } })
+      .select('-password')
+      .sort({ nom: 1 });
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        users
+      }
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Erreur lors de la récupération des utilisateurs'
+    });
+  }
+};
+
+// Modifier le rôle d'un utilisateur avec vérifications
+exports.updateUserRole = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { role, currentUserId } = req.body;
+
+    // 1. Vérification de l'authentification
+    if (!currentUserId) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'Non authentifié - Aucun utilisateur dans la session'
+      });
+    }
+
+    // 2. Récupérer l'utilisateur actuel et celui à modifier
+    const currentUser = await User.findById(currentUserId);
+    const userToUpdate = await User.findById(userId);
+
+    if (!currentUser || !userToUpdate) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'Utilisateur non trouvé'
+      });
+    }
+
+    // 3. Empêcher la modification d'un admin
+    if (userToUpdate.role === 'admin') {
+      return res.status(403).json({
+        status: 'fail',
+        message: 'Action non autorisée sur un administrateur'
+      });
+    }
+
+    // 4. Règles spécifiques de modification de rôle
+    if (currentUser.role === 'superviseur') {
+      // Un superviseur ne peut pas modifier un autre superviseur
+      if (userToUpdate.role === 'superviseur') {
+        return res.status(403).json({
+          status: 'fail',
+          message: 'Vous ne pouvez pas modifier un autre superviseur'
+        });
+      }
+      
+      // Un superviseur ne peut pas rétrograder un superviseur en technicien
+      if (userToUpdate.role === 'superviseur' && role === 'technicien') {
+        return res.status(403).json({
+          status: 'fail',
+          message: 'Vous ne pouvez pas rétrograder un superviseur en technicien'
+        });
+      }
+    }
+
+    // 5. Règles générales de modification de rôle
+    // Bloquer la rétrogradation superviseur -> technicien pour tous
+    if (userToUpdate.role === 'superviseur' && role === 'technicien') {
+      return res.status(403).json({
+        status: 'fail',
+        message: 'La rétrogradation superviseur -> technicien est interdite'
+      });
+    }
+
+    // Autoriser la promotion technicien -> superviseur seulement pour les admins
+    if (userToUpdate.role === 'technicien' && role === 'superviseur') {
+      if (currentUser.role !== 'admin') {
+        return res.status(403).json({
+          status: 'fail',
+          message: 'Seuls les administrateurs peuvent promouvoir en superviseur'
+        });
+      }
+    }
+
+    // 6. Mettre à jour le rôle
+    userToUpdate.role = role;
+    await userToUpdate.save();
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user: {
+          id: userToUpdate._id,
+          nom: userToUpdate.nom,
+          email: userToUpdate.email,
+          role: userToUpdate.role
+        }
+      }
+    });
+  } catch (err) {
+    console.error("Erreur updateUserRole:", err);
+    res.status(500).json({
+      status: 'error',
+      message: err.message || 'Erreur lors de la mise à jour du rôle'
+    });
+  }
+};
