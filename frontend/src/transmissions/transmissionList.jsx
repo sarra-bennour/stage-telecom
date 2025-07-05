@@ -5,6 +5,7 @@ import axios from "axios"
 import AddTransmission from "./addTransmission"
 import PopUp from "../partials/popup"
 import "./transmission-crud.css"
+import { exportToExcel, exportToPDF } from '../utils/exportUtils';
 
 const TransmissionList = () => {
   // State management
@@ -37,7 +38,6 @@ const TransmissionList = () => {
         const response = await axios.get("http://localhost:3000/users/check-auth", {
           withCredentials: true,
         })
-        console.log("user", response.data.data.user)
         setUser(response.data.data?.user || null)
       } catch (error) {
         setUser(null)
@@ -105,6 +105,33 @@ const TransmissionList = () => {
     }
   }
 
+  const handleExport = (format) => {
+    const columns = [
+      { key: 'type', header: 'Type' },
+      { key: 'configuration', header: 'Configuration' },
+      { key: 'debit', header: 'Débit (Mbps)' },
+      { key: 'fournisseur', header: 'Fournisseur' },
+      { key: 'date_installation', header: 'Date Installation' },
+      { key: 'date_derniere_maintenance', header: 'Dernière Maintenance' }
+    ];
+
+    const data = filteredData.map(item => ({
+      ...item,
+      date_installation: item.date_installation
+        ? new Date(item.date_installation).toLocaleDateString("fr-FR")
+        : 'N/A',
+      date_derniere_maintenance: item.date_derniere_maintenance
+        ? new Date(item.date_derniere_maintenance).toLocaleDateString("fr-FR")
+        : 'N/A'
+    }));
+
+    if (format === 'excel') {
+      exportToExcel(data, columns, 'liste_transmissions');
+    } else {
+      exportToPDF(data, columns, 'liste_transmissions', 'Liste des Transmissions');
+    }
+  };
+
   const handleBulkDelete = async () => {
     if (selectedItems.length === 0) return
 
@@ -127,16 +154,16 @@ const TransmissionList = () => {
   }
 
   const handleCardClick = (id) => {
-  if (user?.role !== "admin") return; // Seulement pour les admins
-  
-  setSelectedItems(prev => {
-    if (prev.includes(id)) {
-      return prev.filter(item => item !== id); // Désélectionne si déjà sélectionné
-    } else {
-      return [...prev, id]; // Sélectionne si non sélectionné
-    }
-  });
-};
+    if (user?.role !== "admin") return; // Seulement pour les admins
+
+    setSelectedItems(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(item => item !== id); // Désélectionne si déjà sélectionné
+      } else {
+        return [...prev, id]; // Sélectionne si non sélectionné
+      }
+    });
+  };
 
   const handleSuccess = (message) => {
     setPopup({ type: "success", message: message, isVisible: true })
@@ -208,6 +235,7 @@ const TransmissionList = () => {
       setSelectedItems((prev) => prev.filter((item) => item !== id))
     }
   }
+
 
   // Pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage)
@@ -379,7 +407,62 @@ const TransmissionList = () => {
           )}
         </div>
 
-        <div style={{ marginLeft: "980px", marginBottom: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginLeft: "780px", marginBottom: "10px" }}>
+          <button
+            onClick={() => handleExport('excel')}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.5rem 1rem",
+              border: "none",
+              borderRadius: "0.5rem",
+              backgroundColor: "#10B981",
+              color: "white",
+              fontSize: "0.875rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "all 0.2s ease"
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#059669";
+              e.target.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "#10B981";
+              e.target.style.transform = "translateY(0)";
+            }}
+          >
+            <i className="fas fa-file-excel"></i> Excel
+          </button>
+          <button
+            onClick={() => handleExport('pdf')}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.5rem 1rem",
+              border: "none",
+              borderRadius: "0.5rem",
+              backgroundColor: "#EF4444",
+              color: "white",
+              fontSize: "0.875rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "all 0.2s ease"
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#DC2626";
+              e.target.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "#EF4444";
+              e.target.style.transform = "translateY(0)";
+            }}
+          >
+            <i className="fas fa-file-pdf"></i> PDF
+          </button>
+
           {user?.role !== "technicien" && (
             <button
               onClick={() => {
@@ -428,16 +511,16 @@ const TransmissionList = () => {
             ) : (
               <div className="transmission-crud-cards-grid">
                 {currentTransmissions.map((transmission) => (
-                  <div 
-                    key={transmission._id} 
+                  <div
+                    key={transmission._id}
                     className={`transmission-crud-card ${selectedItems.includes(transmission._id) ? 'selected' : ''}`}
                     onClick={() => handleCardClick(transmission._id)}
                   >
                     {/* Card Header */}
                     <div className="transmission-crud-card-header">
                       {user?.role === "admin" && (
-                        <div 
-                          className="transmission-crud-card-checkbox" 
+                        <div
+                          className="transmission-crud-card-checkbox"
                           onClick={(e) => e.stopPropagation()} // Empêche la propagation du clic
                         >
                           <input
@@ -568,7 +651,7 @@ const TransmissionList = () => {
                         </div>
                       )}
                     </div>
-                    
+
                   </div>
                 ))}
               </div>

@@ -5,6 +5,8 @@ import axios from "axios"
 import AddAntenne from "./addAntenne"
 import PopUp from "../partials/popup"
 import "./antenne-crud.css"
+import { exportToExcel, exportToPDF } from '../utils/exportUtils';
+
 
 const AntennesList = () => {
   // State management
@@ -37,7 +39,6 @@ const AntennesList = () => {
         const response = await axios.get("http://localhost:3000/users/check-auth", {
           withCredentials: true,
         })
-        console.log("user", response.data.data.user)
         setUser(response.data.data?.user || null)
       } catch (error) {
         setUser(null)
@@ -210,6 +211,31 @@ const AntennesList = () => {
     setCurrentPage(page)
   }
 
+  // Ajoutez cette fonction dans le composant
+  const handleExport = (format) => {
+    const columns = [
+      { key: 'type', header: 'Type' },
+      { key: 'station.nom', header: 'Station' },
+      { key: 'frequence', header: 'Fréquence (MHz)' },
+      { key: 'fournisseur', header: 'Fournisseur' },
+      { key: 'HBA', header: 'HBA (m)' },
+      { key: 'etat', header: 'État' },
+      { key: 'tilt', header: 'Tilt (°)' },
+      { key: 'azimut', header: 'Azimut (°)' }
+    ];
+
+    const data = filteredData.map(item => ({
+      ...item,
+      'station.nom': item.station?.nom || 'N/A'
+    }));
+
+    if (format === 'excel') {
+      exportToExcel(data, columns, 'liste_antennes');
+    } else {
+      exportToPDF(data, columns, 'liste_antennes', 'Liste des Antennes');
+    }
+  };
+
   if (loading) {
     return (
       <div className="antenne-crud-loading">
@@ -351,19 +377,75 @@ const AntennesList = () => {
               Liste des Antennes ({filteredData.length})
             </h3>
             <div className="antenne-crud-table-actions">
-              {user?.role !== "technicien" && (
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <button
-                  onClick={() => {
-                    setEditMode(false)
-                    setEditingAntenne(null)
-                    setShowModal(true)
+                  onClick={() => handleExport('excel')}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.5rem 1rem",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    backgroundColor: "#10B981",
+                    color: "white",
+                    fontSize: "0.875rem",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
                   }}
-                  className="antenne-crud-add-btn"
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#059669";
+                    e.target.style.transform = "translateY(-1px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "#10B981";
+                    e.target.style.transform = "translateY(0)";
+                  }}
                 >
-                  <i className="fas fa-plus"></i>
-                  Nouvelle Antenne
+                  <i className="fas fa-file-excel"></i> Excel
                 </button>
-              )}
+                <button
+                  onClick={() => handleExport('pdf')}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.5rem 1rem",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    backgroundColor: "#EF4444",
+                    color: "white",
+                    fontSize: "0.875rem",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#DC2626";
+                    e.target.style.transform = "translateY(-1px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "#EF4444";
+                    e.target.style.transform = "translateY(0)";
+                  }}
+                >
+                  <i className="fas fa-file-pdf"></i> PDF
+                </button>
+                {user?.role !== "technicien" && (
+                  <button
+                    onClick={() => {
+                      setEditMode(false)
+                      setEditingAntenne(null)
+                      setShowModal(true)
+                    }}
+                    className="antenne-crud-add-btn"
+                  >
+                    <i className="fas fa-plus"></i>
+                    Nouvelle Antenne
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -544,13 +626,12 @@ const AntennesList = () => {
                         <div className="antenne-crud-status-cell">
                           <span className={`antenne-crud-badge etat-${antenne.etat}`}>
                             <i
-                              className={`fas ${
-                                antenne.etat === "actif"
-                                  ? "fa-check-circle"
-                                  : antenne.etat === "maintenance"
-                                    ? "fa-tools"
-                                    : "fa-times-circle"
-                              }`}
+                              className={`fas ${antenne.etat === "actif"
+                                ? "fa-check-circle"
+                                : antenne.etat === "maintenance"
+                                  ? "fa-tools"
+                                  : "fa-times-circle"
+                                }`}
                             ></i>
                             {antenne.etat === "actif"
                               ? "ACTIF"

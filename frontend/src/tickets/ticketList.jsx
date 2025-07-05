@@ -5,6 +5,7 @@ import axios from "axios"
 import AddTicket from "./AddTicket"
 import PopUp from "../partials/popup"
 import "./ticket-crud.css"
+import { exportToExcel, exportToPDF } from '../utils/exportUtils';
 
 const TicketList = () => {
   // State management
@@ -115,6 +116,31 @@ const TicketList = () => {
     setPopup((prev) => ({ ...prev, isVisible: false }))
   }
 
+  const handleExport = (format) => {
+    const columns = [
+      { key: 'num_ticket', header: 'N° Ticket' },
+      { key: 'statut', header: 'Statut' },
+      { key: 'description_resolution', header: 'Description' },
+      { key: 'superviseur_id.nom', header: 'Superviseur' },
+      { key: 'technicien_id.nom', header: 'Technicien' },
+      { key: 'date_creation', header: 'Date Création' },
+      { key: 'date_cloture', header: 'Date Clôture' }
+    ];
+
+    const data = filteredData.map(item => ({
+      ...item,
+      date_creation: formatDate(item.date_creation),
+      date_cloture: item.date_cloture ? formatDate(item.date_cloture) : 'N/A',
+      'superviseur_id.nom': `${item.superviseur_id.nom} ${item.superviseur_id.prenom}`,
+      'technicien_id.nom': `${item.technicien_id.nom} ${item.technicien_id.prenom}`
+    }));
+
+    if (format === 'excel') {
+      exportToExcel(data, columns, 'liste_tickets');
+    } else {
+      exportToPDF(data, columns, 'liste_tickets', 'Liste des Tickets');
+    }
+  };
   const itemsPerPage = 4
 
   // Apply filters and search
@@ -181,18 +207,18 @@ const TicketList = () => {
   }
 
   const formatDate = (date) => {
-  const originalDate = new Date(date)
-  // Add 1 hour
-  originalDate.setHours(originalDate.getHours() + 1)
-  
-  return originalDate.toLocaleDateString("fr-FR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-}
+    const originalDate = new Date(date)
+    // Add 1 hour
+    originalDate.setHours(originalDate.getHours() + 1)
+
+    return originalDate.toLocaleDateString("fr-FR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
 
   const getDaysOpen = (dateCreation) => {
     const now = new Date()
@@ -292,8 +318,66 @@ const TicketList = () => {
           </div>
         </div>
 
+        
         {/* Add Button */}
-        <div className="ticket-crud-add-section">
+        <div className="ticket-crud-add-section" style={{ display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "flex-end", marginBottom: "1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginLeft: "780px" }}>
+            <button
+              onClick={() => handleExport('excel')}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.5rem 1rem",
+                border: "none",
+                borderRadius: "0.5rem",
+                backgroundColor: "#10B981",
+                color: "white",
+                fontSize: "0.875rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                marginRight: "0.5rem"
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#059669";
+                e.target.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "#10B981";
+                e.target.style.transform = "translateY(0)";
+              }}
+            >
+              <i className="fas fa-file-excel"></i> Excel
+            </button>
+            <button
+              onClick={() => handleExport('pdf')}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.5rem 1rem",
+                border: "none",
+                borderRadius: "0.5rem",
+                backgroundColor: "#EF4444",
+                color: "white",
+                fontSize: "0.875rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.2s ease"
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#DC2626";
+                e.target.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "#EF4444";
+                e.target.style.transform = "translateY(0)";
+              }}
+            >
+              <i className="fas fa-file-pdf"></i> PDF
+            </button>
+          </div>
           <button
             onClick={() => {
               setEditMode(false)
@@ -404,7 +488,7 @@ const TicketList = () => {
                         <span></span>
                         <span></span>
                       </div>
-                      
+
                     </div>
                     <div className="ticket-crud-ticket-actions">
                       <button

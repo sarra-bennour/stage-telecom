@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "./user.css";
 import PopUp from "../partials/popup";
+import { exportToExcel, exportToPDF } from '../utils/exportUtils';
 
-const roles = [ "superviseur", "technicien"];
+const roles = ["superviseur", "technicien"];
 
 
 const UserList = () => {
@@ -43,7 +44,7 @@ const UserList = () => {
 
 
     const handleSuccess = (message) => {
-    setPopup({ type: "success", message: message, isVisible: true });
+        setPopup({ type: "success", message: message, isVisible: true });
     };
 
     const handleError = (message) => {
@@ -133,10 +134,10 @@ const UserList = () => {
         setEditLoading(true);
         handleError("");
         try {
-            await axios.put(`http://localhost:3000/users/update-role/${userId}`, 
-                { 
-                    role: editRole, 
-                    currentUserId: currentUser?._id 
+            await axios.put(`http://localhost:3000/users/update-role/${userId}`,
+                {
+                    role: editRole,
+                    currentUserId: currentUser?._id
                 });
             setEditUserId(null);
             setEditRole("");
@@ -202,6 +203,27 @@ const UserList = () => {
         }
     };
 
+    const handleExport = (format) => {
+        const columns = [
+            { key: 'nom', header: 'Nom' },
+            { key: 'prenom', header: 'Prénom' },
+            { key: 'email', header: 'Email' },
+            { key: 'tel', header: 'Téléphone' },
+            { key: 'role', header: 'Rôle' }
+        ];
+
+        const data = filteredUsers.map(item => ({
+            ...item,
+            role: item.role.charAt(0).toUpperCase() + item.role.slice(1)
+        }));
+
+        if (format === 'excel') {
+            exportToExcel(data, columns, 'liste_utilisateurs');
+        } else {
+            exportToPDF(data, columns, 'liste_utilisateurs', 'Liste des Utilisateurs');
+        }
+    };
+
     // UI
     return (
         <div className="user-crud">
@@ -260,9 +282,65 @@ const UserList = () => {
                         <option value="superviseur">Superviseur</option>
                         <option value="technicien">Technicien</option>
                     </select>
-                    <button className="user-crud-add-btn" onClick={() => setShowAddModal(true)}>
-                        <i className="fas fa-plus"></i> Nouvel utilisateur
-                    </button>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <button
+                            onClick={() => handleExport('excel')}
+                            style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                                padding: "0.5rem 1rem",
+                                border: "none",
+                                borderRadius: "0.5rem",
+                                backgroundColor: "#10B981",
+                                color: "white",
+                                fontSize: "0.875rem",
+                                fontWeight: "600",
+                                cursor: "pointer",
+                                transition: "all 0.2s ease"
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = "#059669";
+                                e.target.style.transform = "translateY(-1px)";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = "#10B981";
+                                e.target.style.transform = "translateY(0)";
+                            }}
+                        >
+                            <i className="fas fa-file-excel"></i> Excel
+                        </button>
+                        <button
+                            onClick={() => handleExport('pdf')}
+                            style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                                padding: "0.5rem 1rem",
+                                border: "none",
+                                borderRadius: "0.5rem",
+                                backgroundColor: "#EF4444",
+                                color: "white",
+                                fontSize: "0.875rem",
+                                fontWeight: "600",
+                                cursor: "pointer",
+                                transition: "all 0.2s ease"
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = "#DC2626";
+                                e.target.style.transform = "translateY(-1px)";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = "#EF4444";
+                                e.target.style.transform = "translateY(0)";
+                            }}
+                        >
+                            <i className="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <button className="user-crud-add-btn" onClick={() => setShowAddModal(true)}>
+                            <i className="fas fa-plus"></i> Nouvel utilisateur
+                        </button>
+                    </div>
                 </div>
 
                 {/* Table utilisateurs */}
@@ -365,7 +443,7 @@ const UserList = () => {
                                         {roles.map(r => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
                                     </select>
                                 </div>
-                                
+
                                 <div className="user-crud-modal-actions">
                                     <button type="button" className="user-crud-modal-cancel" onClick={() => setShowAddModal(false)}>Annuler</button>
                                     <button type="submit" className="user-crud-modal-submit" disabled={addLoading}>{addLoading ? "Ajout..." : "Ajouter"}</button>
@@ -421,7 +499,7 @@ const UserList = () => {
             </div>
             {/* PopUp */}
             <PopUp type={popup.type} message={popup.message} isVisible={popup.isVisible} onClose={closePopup} />
-        </div> 
+        </div>
     );
 };
 

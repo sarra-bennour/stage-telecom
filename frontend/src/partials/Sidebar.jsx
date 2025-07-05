@@ -1,6 +1,27 @@
 import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
+
 
 const Sidebar = () =>{
+   const [currentUser, setCurrentUser] = useState(null);
+    const [authLoading, setAuthLoading] = useState(true);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await axios.get("http://localhost:3000/users/check-auth", {
+                    withCredentials: true,
+                });
+                setCurrentUser(response.data.data?.user || null);
+            } catch (error) {
+                setCurrentUser(null);
+            } finally {
+                setAuthLoading(false);
+            }
+        };
+        checkAuth();
+    }, []);
     return(
         <>
 {/* sidenav  */}
@@ -32,6 +53,26 @@ const Sidebar = () =>{
             <span className="ml-1 duration-300 opacity-100 ease">Dashboard</span>
           </NavLink>
       </li>
+      {currentUser?.role === 'admin' && (
+                            <li className="mt-0.5 w-full">
+                                <NavLink
+                                    to="/user-list"
+                                    className={({ isActive }) =>
+                                        `py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg ${
+                                            isActive
+                                                ? 'bg-blue-500/20 bg-blue-500/13 text-blue-700 font-semibold'
+                                                : 'text-slate-700 dark:text-white dark:opacity-80'
+                                        }`
+                                    }
+                                >
+                                    <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg text-center xl:p-2.5">
+                                        <i className="las la-users relative top-0 text-xl leading-normal text-purple-500" />
+                                    </div>
+                                    <span className="ml-1 duration-300 opacity-100 ease">Utilisateurs</span>
+                                </NavLink>
+                            </li>
+                        )}
+
       <li className="mt-0.5 w-full">
         <NavLink
             to="/station-list"

@@ -5,6 +5,7 @@ import axios from "axios";
 import AddUpdateStation from "./addUpdateStation"
 import PopUp from "../partials/popup"
 import StationMap from "./stationMap"
+import { exportToExcel, exportToPDF } from '../utils/exportUtils';
 
 
 const StationList = () => {
@@ -41,7 +42,6 @@ const StationList = () => {
         const response = await axios.get('http://localhost:3000/users/check-auth', {
           withCredentials: true
         });
-        console.log("userrrrr",response.data.data.user)
         setUser(response.data.data?.user || null);
       } catch (error) {
         setUser(null);
@@ -89,9 +89,9 @@ const StationList = () => {
 
   const handleEditClick = (station) => {
     setEditingStation({
-    ...station,
-    images_secteurs: station.images_secteurs || []
-  });
+      ...station,
+      images_secteurs: station.images_secteurs || []
+    });
     setEditMode(true);
     setShowModal(true);
   };
@@ -118,6 +118,33 @@ const StationList = () => {
       isVisible: false,
     }))
   }
+
+  const handleExport = (format) => {
+    const columns = [
+      { key: 'nom', header: 'Nom' },
+      { key: 'type_technique', header: 'Type Technique' },
+      { key: 'statut', header: 'Statut' },
+      { key: 'fournisseur', header: 'Fournisseur' },
+      { key: 'generation', header: 'Génération' },
+      { key: 'puissance', header: 'Puissance (W)' },
+      { key: 'date_installation', header: 'Date Installation' },
+      { key: 'position_x', header: 'Position X' },
+      { key: 'position_y', header: 'Position Y' }
+    ];
+
+    const data = filteredData.map(item => ({
+      ...item,
+      date_installation: item.date_installation
+        ? new Date(item.date_installation).toLocaleDateString('fr-FR')
+        : 'N/A'
+    }));
+
+    if (format === 'excel') {
+      exportToExcel(data, columns, 'liste_stations');
+    } else {
+      exportToPDF(data, columns, 'liste_stations', 'Liste des Stations');
+    }
+  };
 
   useEffect(() => {
     if (searchTerm) {
@@ -163,38 +190,39 @@ const StationList = () => {
     setCurrentPage(1)
   }, [searchTerm, typeFilter, statusFilter, sortFilter, stationsData])
 
-const moveCarousel = (stationId, direction) => {
-  
-  // Utilisez _id au lieu de id car c'est le champ dans vos données
-  const station = stationsData.find((s) => s._id === stationId)
-  
-  if (!station) {
-    console.error("Station non trouvée pour ID:", stationId)
-    return
-  }
+  const moveCarousel = (stationId, direction) => {
 
-  if (!station.images_secteurs || station.images_secteurs.length <= 1) {
-    console.log("Pas assez d'images pour le carrousel")
-    return
-  }
+    // Utilisez _id au lieu de id car c'est le champ dans vos données
+    const station = stationsData.find((s) => s._id === stationId)
 
-  setCarouselStates((prev) => {
-    const currentIndex = prev[stationId]?.currentIndex || 0
-    let newIndex = currentIndex + direction
-
-    // Gestion cyclique
-    if (newIndex < 0) {
-      newIndex = station.images_secteurs.length - 1
-    } else if (newIndex >= station.images_secteurs.length) {
-      newIndex = 0
+    if (!station) {
+      console.error("Station non trouvée pour ID:", stationId)
+      return
     }
 
-    return {
-      ...prev,
-      [stationId]: { currentIndex: newIndex }
+    if (!station.images_secteurs || station.images_secteurs.length <= 1) {
+      console.log("Pas assez d'images pour le carrousel")
+      return
     }
-  })
-}
+
+    setCarouselStates((prev) => {
+      const currentIndex = prev[stationId]?.currentIndex || 0
+      let newIndex = currentIndex + direction
+
+      // Gestion cyclique
+      if (newIndex < 0) {
+        newIndex = station.images_secteurs.length - 1
+      } else if (newIndex >= station.images_secteurs.length) {
+        newIndex = 0
+      }
+
+      return {
+        ...prev,
+        [stationId]: { currentIndex: newIndex }
+      }
+    })
+  }
+
 
   // Get type colors
   const getTypeColor = (type) => {
@@ -219,90 +247,92 @@ const moveCarousel = (stationId, direction) => {
 
   // Create carousel component
   const createCarousel = (images_secteurs, stationId) => {
-  const defaultImage = "././assets/img/placeholder.jpg";
+    const defaultImage = "././assets/img/placeholder.jpg";
 
-  if (!images_secteurs || images_secteurs.length === 0) {
-    return (
-      <div className="rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
-        <img
-          src={defaultImage || "././assets/img/placeholder.jpg"}
-          alt="Station image par défaut"
-          className="w-full h-full"
-          style={{ 
-            objectFit: "cover",
-            backgroundColor: "#f3f4f6",
-            width: "100%",
-            height: "100%"
-          }}
-          onError={(e) => {
-            e.target.src = defaultImage
-          }}
-        />
-      </div>
-    )
-  }
-
-  const currentIndex = carouselStates[stationId]?.currentIndex || 0;
-
-  // Préparer les URLs des images
-  const processedImages = images_secteurs.map((img) => {
-    // Si l'image est déjà une URL complète, la garder
-    if (img.startsWith("http://") || img.startsWith("https://")) {
-      return img
-    }
-    // Sinon, ajouter le base URL
-    return `http://localhost:3000${img.startsWith("/") ? img : `/${img}`}`
-  })
-
-  if (processedImages.length <= 1) {
-    return (
-      <div className="rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
-        <img
-          src={processedImages[0] || defaultImage}
-          alt="Station image"
-          className="w-full h-full"
-          style={{ 
-            objectFit: "cover",
-            backgroundColor: "#f3f4f6",
-            width: "100%",
-            height: "100%"
-          }}
-          onError={(e) => {
-            e.target.src = defaultImage
-          }}
-        />
-      </div>
-    )
-  }
-  
-
-  return (
-    <div className="relative rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
-      <div className="overflow-hidden h-full">
-        <div
-          className="flex transition-transform duration-300 ease-in-out h-full"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-        >
-          {processedImages.map((img, index) => (
-            <div key={index} className="w-full h-full flex-shrink-0">
-              <img
-                src={img || defaultImage}
-                alt={`Station image ${index + 1}`}
-                className="w-full h-full"
-                style={{ 
-                  objectFit: "cover",
-                  backgroundColor: "#f3f4f6",
-                  width: "100%",
-                  height: "100%"
-                }}
-                onError={(e) => {
-                  e.target.src = defaultImage
-                }}
-              />
-            </div>
-          ))}
+    if (!images_secteurs || images_secteurs.length === 0) {
+      return (
+        <div className="rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
+          <img
+            src={defaultImage || "././assets/img/placeholder.jpg"}
+            alt="Station image par défaut"
+            className="w-full h-full"
+            style={{
+              objectFit: "cover",
+              backgroundColor: "#f3f4f6",
+              width: "100%",
+              height: "100%"
+            }}
+            onError={(e) => {
+              e.target.src = defaultImage
+            }}
+          />
         </div>
-      </div>
+      )
+    }
+
+    const currentIndex = carouselStates[stationId]?.currentIndex || 0;
+
+    // Préparer les URLs des images
+    const processedImages = images_secteurs.map((img) => {
+      // Si l'image est déjà une URL complète, la garder
+      if (img.startsWith("http://") || img.startsWith("https://")) {
+        return img
+      }
+      // Sinon, ajouter le base URL
+      return `http://localhost:3000${img.startsWith("/") ? img : `/${img}`}`
+    })
+
+    if (processedImages.length <= 1) {
+      return (
+        <div className="rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
+          <img
+            src={processedImages[0] || defaultImage}
+            alt="Station image"
+            className="w-full h-full"
+            style={{
+              objectFit: "cover",
+              backgroundColor: "#f3f4f6",
+              width: "100%",
+              height: "100%"
+            }}
+            onError={(e) => {
+              e.target.src = defaultImage
+            }}
+          />
+        </div>
+      )
+    }
+
+
+
+
+    return (
+      <div className="relative rounded-t-2xl overflow-hidden" style={{ height: "192px" }}>
+        <div className="overflow-hidden h-full">
+          <div
+            className="flex transition-transform duration-300 ease-in-out h-full"
+            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+          >
+            {processedImages.map((img, index) => (
+              <div key={index} className="w-full h-full flex-shrink-0">
+                <img
+                  src={img || defaultImage}
+                  alt={`Station image ${index + 1}`}
+                  className="w-full h-full"
+                  style={{
+                    objectFit: "cover",
+                    backgroundColor: "#f3f4f6",
+                    width: "100%",
+                    height: "100%"
+                  }}
+                  onError={(e) => {
+                    e.target.src = defaultImage
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Left Arrow */}
         <button
@@ -445,155 +475,155 @@ const moveCarousel = (stationId, direction) => {
     <div className="flex-1 bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
       <div className="px-4 sm:px-6 lg:px-8 py-6">
         {/* Stats Cards Row */}
-<div className="flex flex-wrap -mx-3 mb-6">
-  {/* Card 1 - Total Stations */}
-  <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
-    <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
-      <div className="flex-auto p-4">
-        <div className="flex items-center">
-          {/* Cercle avec icône */}
-          <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}>
-            <i className="fas fa-tower-cell text-2xl" style={{ color: '#3B82F6' }}></i>
-          </div>
-          
-          <div>
-            <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Total Stations</p>
-            <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>{stationsData.length}</h5>
-            <p className="text-xs" style={{ color: '#10B981' }}>
-              <i className="fas fa-arrow-up mr-1"></i> +{Math.floor(stationsData.length * 0.12)} ce mois-ci
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div className="flex flex-wrap -mx-3 mb-6">
+          {/* Card 1 - Total Stations */}
+          <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
+              <div className="flex-auto p-4">
+                <div className="flex items-center">
+                  {/* Cercle avec icône */}
+                  <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}>
+                    <i className="fas fa-tower-cell text-2xl" style={{ color: '#3B82F6' }}></i>
+                  </div>
 
-  {/* Card 2 - Active Stations */}
-  <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
-    <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
-      <div className="flex-auto p-4">
-        <div className="flex items-center">
-          <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
-            <i className="fas fa-check-circle text-2xl" style={{ color: '#10B981' }}></i>
-          </div>
-          
-          <div>
-            <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Stations Actives</p>
-            <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>
-              {stationsData.filter((s) => s.statut === "actif").length}
-            </h5>
-            <p className="text-xs" style={{ color: '#10B981' }}>
-              {stationsData.length > 0
-                ? Math.round(
-                    (stationsData.filter((s) => s.statut === "actif").length / stationsData.length) * 100
-                  )
-                : 0}% du total
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* Card 3 - Puissance totale */}
-  <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
-    <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
-      <div className="flex-auto p-4">
-        <div className="flex items-center">
-          <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(249, 115, 22, 0.1)' }}>
-            <i className="fas fa-bolt text-2xl" style={{ color: '#F97316' }}></i>
-          </div>
-          
-          <div>
-            <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Puissance Totale</p>
-            <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>
-              {stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0)}W
-            </h5>
-            <p className="text-xs" style={{ color: '#6B7280' }}>
-              Moyenne: {stationsData.length > 0
-                ? Math.round(
-                    stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0) / stationsData.length
-                  )
-                : 0}W
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* Card 4 - Maintenance */}
-  <div className="w-full max-w-full px-3 sm:w-1/2 sm:flex-none xl:w-1/4">
-    <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
-      <div className="flex-auto p-4">
-        <div className="flex items-center">
-          <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)' }}>
-            <i className="fas fa-tools text-2xl" style={{ color: '#EAB308' }}></i>
-          </div>
-          
-          <div>
-            <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Maintenance</p>
-            <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>
-              {stationsData.filter((s) => s.statut === "maintenance").length}
-            </h5>
-            <p className="text-xs" style={{ color: '#EF4444' }}>
-              {stationsData.length > 0
-                ? Math.round(
-                    (stationsData.filter((s) => s.statut === "maintenance").length / stationsData.length) * 100
-                  )
-                : 0}% du total
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-        {/* Map Section */}
-<div className="flex flex-wrap mt-6 -mx-3 mb-6">
-  <div className="w-full max-w-full px-3">
-    <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-blue-100">
-      <div className="flex-auto p-6">
-        <button
-          onClick={() => setShowMap(!showMap)}
-          className="text-2xl font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-200 flex items-center gap-2"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-            />
-          </svg>
-          Carte des stations ({stationsData.filter(s => s.position_x && s.position_y).length} localisées)
-          <svg
-            className={`w-5 h-5 transition-transform duration-200 ${showMap ? "rotate-180" : ""}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-
-        {showMap && (
-          <div className="mt-4">
-            <div className="w-full max-w-6xl mx-auto h-96 rounded-2xl overflow-hidden border border-blue-200">
-              <StationMap 
-                stations={stationsData} 
-                onStationClick={(station) => {
-                  console.log('Station cliquée:', station)
-                }}
-              />
+                  <div>
+                    <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Total Stations</p>
+                    <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>{stationsData.length}</h5>
+                    <p className="text-xs" style={{ color: '#10B981' }}>
+                      <i className="fas fa-arrow-up mr-1"></i> +{Math.floor(stationsData.length * 0.12)} ce mois-ci
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        )}
-      </div>
-    </div>
-  </div>
-</div>
+
+          {/* Card 2 - Active Stations */}
+          <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
+              <div className="flex-auto p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
+                    <i className="fas fa-check-circle text-2xl" style={{ color: '#10B981' }}></i>
+                  </div>
+
+                  <div>
+                    <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Stations Actives</p>
+                    <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>
+                      {stationsData.filter((s) => s.statut === "actif").length}
+                    </h5>
+                    <p className="text-xs" style={{ color: '#10B981' }}>
+                      {stationsData.length > 0
+                        ? Math.round(
+                          (stationsData.filter((s) => s.statut === "actif").length / stationsData.length) * 100
+                        )
+                        : 0}% du total
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3 - Puissance totale */}
+          <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
+              <div className="flex-auto p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(249, 115, 22, 0.1)' }}>
+                    <i className="fas fa-bolt text-2xl" style={{ color: '#F97316' }}></i>
+                  </div>
+
+                  <div>
+                    <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Puissance Totale</p>
+                    <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>
+                      {stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0)}W
+                    </h5>
+                    <p className="text-xs" style={{ color: '#6B7280' }}>
+                      Moyenne: {stationsData.length > 0
+                        ? Math.round(
+                          stationsData.reduce((sum, station) => sum + (station.puissance || 0), 0) / stationsData.length
+                        )
+                        : 0}W
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 4 - Maintenance */}
+          <div className="w-full max-w-full px-3 sm:w-1/2 sm:flex-none xl:w-1/4">
+            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-200">
+              <div className="flex-auto p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)' }}>
+                    <i className="fas fa-tools text-2xl" style={{ color: '#EAB308' }}></i>
+                  </div>
+
+                  <div>
+                    <p className="mb-0 text-sm font-semibold uppercase" style={{ color: '#4B5563' }}>Maintenance</p>
+                    <h5 className="mb-1 text-2xl font-bold" style={{ color: '#1F2937' }}>
+                      {stationsData.filter((s) => s.statut === "maintenance").length}
+                    </h5>
+                    <p className="text-xs" style={{ color: '#EF4444' }}>
+                      {stationsData.length > 0
+                        ? Math.round(
+                          (stationsData.filter((s) => s.statut === "maintenance").length / stationsData.length) * 100
+                        )
+                        : 0}% du total
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Map Section */}
+        <div className="flex flex-wrap mt-6 -mx-3 mb-6">
+          <div className="w-full max-w-full px-3">
+            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border border border-blue-100">
+              <div className="flex-auto p-6">
+                <button
+                  onClick={() => setShowMap(!showMap)}
+                  className="text-2xl font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-200 flex items-center gap-2"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                    />
+                  </svg>
+                  Carte des stations ({stationsData.filter(s => s.position_x && s.position_y).length} localisées)
+                  <svg
+                    className={`w-5 h-5 transition-transform duration-200 ${showMap ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {showMap && (
+                  <div className="mt-4">
+                    <div className="w-full max-w-6xl mx-auto h-96 rounded-2xl overflow-hidden border border-blue-200">
+                      <StationMap
+                        stations={stationsData}
+                        onStationClick={(station) => {
+                          console.log('Station cliquée:', station)
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Search and Filters */}
         <div className="flex flex-wrap mt-6 -mx-3 mb-6">
@@ -686,41 +716,98 @@ const moveCarousel = (stationId, direction) => {
           <div className="bg-white p-3 rounded-xl border border-gray-100">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800">Stations ({filteredData.length})</h3>
-              {user?.role !== 'technicien' && (
-              <button
-                onClick={() => setShowModal(true)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.5rem 1rem",
-                  backgroundColor: "#3B82F6",
-                  color: "white",
-                  fontWeight: "500",
-                  borderRadius: "0.5rem",
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  outline: "none",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#1d4ed8"
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "#3B82F6"
-                }}
-              >
-                <svg
-                  style={{ width: "1.25rem", height: "1.25rem" }}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <button
+                  onClick={() => handleExport('excel')}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.5rem 1rem",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    backgroundColor: "#10B981",
+                    color: "white",
+                    fontSize: "0.875rem",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#059669";
+                    e.target.style.transform = "translateY(-1px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "#10B981";
+                    e.target.style.transform = "translateY(0)";
+                  }}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Nouvelle Station
-              </button>
-              )}
+                  <i className="fas fa-file-excel"></i> Excel
+                </button>
+
+                <button
+                  onClick={() => handleExport('pdf')}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.5rem 1rem",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    backgroundColor: "#EF4444",
+                    color: "white",
+                    fontSize: "0.875rem",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#DC2626";
+                    e.target.style.transform = "translateY(-1px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "#EF4444";
+                    e.target.style.transform = "translateY(0)";
+                  }}
+                >
+                  <i className="fas fa-file-pdf"></i> PDF
+                </button>
+                {user?.role !== 'technicien' && (
+                  <button
+                    onClick={() => setShowModal(true)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      padding: "0.5rem 1rem",
+                      backgroundColor: "#3B82F6",
+                      color: "white",
+                      fontWeight: "500",
+                      borderRadius: "0.5rem",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                      outline: "none",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = "#1d4ed8"
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = "#3B82F6"
+                    }}
+                  >
+                    <svg
+                      style={{ width: "1.25rem", height: "1.25rem" }}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Nouvelle Station
+                  </button>
+                )}
+              </div>
             </div>
 
             {filteredData.length === 0 ? (
@@ -777,94 +864,94 @@ const moveCarousel = (stationId, direction) => {
                     <div className="absolute top-2 right-2 z-10">
                       <div className="relative">
                         {user?.role !== 'technicien' && (
-                        <button
-                          className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setCarouselStates(prev => ({
-                              ...prev,
-                              [station._id]: {
-                                ...prev[station._id],
-                                showMenu: !prev[station._id]?.showMenu
-                              }
-                            }));
-                          }}
-                        >
-                          <svg 
-                            width="24" 
-                            height="24" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="white" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round"
-                            style={{ filter: "drop-shadow(0 0 2px rgba(0,0,0,0.5))" }}
+                          <button
+                            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCarouselStates(prev => ({
+                                ...prev,
+                                [station._id]: {
+                                  ...prev[station._id],
+                                  showMenu: !prev[station._id]?.showMenu
+                                }
+                              }));
+                            }}
                           >
-                            <circle cx="12" cy="12" r="1"></circle>
-                            <circle cx="12" cy="5" r="1"></circle>
-                            <circle cx="12" cy="19" r="1"></circle>
-                          </svg>
-                        </button>
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="white"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              style={{ filter: "drop-shadow(0 0 2px rgba(0,0,0,0.5))" }}
+                            >
+                              <circle cx="12" cy="12" r="1"></circle>
+                              <circle cx="12" cy="5" r="1"></circle>
+                              <circle cx="12" cy="19" r="1"></circle>
+                            </svg>
+                          </button>
                         )}
-                        
+
                         {/* Menu déroulant avec SVG */}
                         {carouselStates[station._id]?.showMenu && (
                           <div className="absolute left-0 mt-1 w-40 bg-white rounded-md shadow-lg z-20 border border-gray-200">
                             <div className="py-1">
                               {user?.role !== 'technicien' && (
-                              <button
-                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEditClick(station);
-                                }}
-                              >
-                                {/* SVG pour l'icône de modification */}
-                                <svg 
-                                  width="16" 
-                                  height="16" 
-                                  viewBox="0 0 24 24" 
-                                  fill="none" 
-                                  stroke="currentColor" 
-                                  strokeWidth="2" 
-                                  strokeLinecap="round" 
-                                  strokeLinejoin="round"
-                                  className="mr-2"
+                                <button
+                                  className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditClick(station);
+                                  }}
                                 >
-                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                </svg>
-                                Modifier
-                              </button>
+                                  {/* SVG pour l'icône de modification */}
+                                  <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="mr-2"
+                                  >
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                  </svg>
+                                  Modifier
+                                </button>
                               )}
                               {user?.role === 'admin' && (
-                              <button
-                                className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  console.log("Supprimer", station._id);
-                                }}
-                              >
-                                {/* SVG pour l'icône de suppression */}
-                                <svg 
-                                  width="16" 
-                                  height="16" 
-                                  viewBox="0 0 24 24" 
-                                  fill="none" 
-                                  stroke="currentColor" 
-                                  strokeWidth="2" 
-                                  strokeLinecap="round" 
-                                  strokeLinejoin="round"
-                                  className="mr-2"
+                                <button
+                                  className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log("Supprimer", station._id);
+                                  }}
                                 >
-                                  <polyline points="3 6 5 6 21 6"></polyline>
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                  <line x1="10" y1="11" x2="10" y2="17"></line>
-                                  <line x1="14" y1="11" x2="14" y2="17"></line>
-                                </svg>
-                                Supprimer
-                              </button>
+                                  {/* SVG pour l'icône de suppression */}
+                                  <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="mr-2"
+                                  >
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                  </svg>
+                                  Supprimer
+                                </button>
                               )}
                             </div>
                           </div>
@@ -919,15 +1006,14 @@ const moveCarousel = (stationId, direction) => {
                                   : station.type_technique === "indoor"
                                     ? "#7c3aed"
                                     : "#ea580c",
-                            border: `1px solid ${
-                              station.type_technique === "macro"
-                                ? "#bfdbfe"
-                                : station.type_technique === "micro"
-                                  ? "#bbf7d0"
-                                  : station.type_technique === "indoor"
-                                    ? "#e9d5ff"
-                                    : "#fed7aa"
-                            }`,
+                            border: `1px solid ${station.type_technique === "macro"
+                              ? "#bfdbfe"
+                              : station.type_technique === "micro"
+                                ? "#bbf7d0"
+                                : station.type_technique === "indoor"
+                                  ? "#e9d5ff"
+                                  : "#fed7aa"
+                              }`,
                             whiteSpace: "nowrap",
                           }}
                         >
@@ -1085,10 +1171,10 @@ const moveCarousel = (stationId, direction) => {
                             <span style={{ fontSize: "0.75rem", color: "#6b7280" }}>
                               {station.date_installation
                                 ? new Date(station.date_installation).toLocaleDateString("fr-FR", {
-                                    day: "numeric",
-                                    month: "short",
-                                    year: "numeric",
-                                  })
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })
                                 : "N/A"}
                             </span>
                           </div>
@@ -1147,11 +1233,10 @@ const moveCarousel = (stationId, direction) => {
                       <button
                         key={page}
                         onClick={() => goToPage(page)}
-                        className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                          page === currentPage
-                            ? "text-white bg-blue-500 border border-blue-500"
-                            : "text-gray-600 bg-white border border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                        }`}
+                        className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${page === currentPage
+                          ? "text-white bg-blue-500 border border-blue-500"
+                          : "text-gray-600 bg-white border border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                          }`}
                       >
                         {page}
                       </button>

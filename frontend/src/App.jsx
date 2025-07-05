@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Layout from './partials/Layout';
@@ -17,48 +16,56 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Login/>} />
-        <Route path='/signup' element={<Signup/>} />
+        {/* Routes publiques */}
+        <Route path='/' element={<Login />} />
+        <Route path='/signup' element={<Signup />} />
+
+        {/* Routes protégées */}
         <Route element={<Layout />}>
-        <Route path='/user-list' element={
-            <ProtectedRoute>
-              <UserList/>
-            </ProtectedRoute>
-          } />
+          {/* Accessible à tous les utilisateurs connectés */}
           <Route path='/dashboard' element={
             <ProtectedRoute>
-              <Dashboard/>
+              <Dashboard />
             </ProtectedRoute>
           } />
+
+          {/* Réservé aux admins seulement */}
+          <Route path='/user-list' element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <UserList />
+            </ProtectedRoute>
+          } />
+
+          {/* Routes pour autres rôles (ajuster selon besoins) */}
           <Route path='/station-list' element={
             <ProtectedRoute>
-              <StationList/>
+              <StationList />
             </ProtectedRoute>
           } />
           <Route path='/antenne-list' element={
             <ProtectedRoute>
-              <AntennesList/>
+              <AntennesList />
             </ProtectedRoute>
           } />
           <Route path='/transmission-list' element={
             <ProtectedRoute>
-              <TransmissionList/>
+              <TransmissionList />
             </ProtectedRoute>
           } />
           <Route path='/derangement-list' element={
             <ProtectedRoute>
-              <DerangementList/>
+              <DerangementList />
             </ProtectedRoute>
           } />
           <Route path='/ticket-list' element={
             <ProtectedRoute>
-              <TicketList/>
+              <TicketList />
             </ProtectedRoute>
           } />
         </Route>
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
 export default App;

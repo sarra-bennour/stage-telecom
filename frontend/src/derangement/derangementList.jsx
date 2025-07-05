@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import "./derangement-crud.css"
 import AddDerangement from "./addDerangement"
+import { exportToExcel, exportToPDF } from '../utils/exportUtils';
 
 const DerangementList = () => {
   // State management
@@ -87,6 +88,29 @@ const DerangementList = () => {
     // Vous pouvez ajouter ici votre système de notification
   }
 
+  const handleExport = (format) => {
+    const columns = [
+      { key: 'type', header: 'Type' },
+      { key: 'priorite', header: 'Priorité' },
+      { key: 'description', header: 'Description' },
+      { key: 'date_occurrence', header: 'Date Occurrence' },
+      { key: 'ticket.num_ticket', header: 'N° Ticket' }
+    ];
+
+    const data = filteredData.map(item => ({
+      ...item,
+      date_occurrence: item.date_occurrence
+        ? new Date(item.date_occurrence).toLocaleDateString("fr-FR")
+        : 'N/A',
+      'ticket.num_ticket': item.ticket?.num_ticket || 'N/A'
+    }));
+
+    if (format === 'excel') {
+      exportToExcel(data, columns, 'liste_derangements');
+    } else {
+      exportToPDF(data, columns, 'liste_derangements', 'Liste des Dérangements');
+    }
+  };
   // Apply filters and search
   useEffect(() => {
     const filtered = derangementsData.filter((derangement) => {
@@ -287,7 +311,61 @@ const DerangementList = () => {
           </div>
         </div>
 
-        <div className="derangement-history-add-button-container">
+        <div className="derangement-history-add-button-container" style={{ display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "flex-end", marginBottom: "1rem" }}>
+          <button
+            onClick={() => handleExport('excel')}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.5rem 1rem",
+              border: "none",
+              borderRadius: "0.5rem",
+              backgroundColor: "#10B981",
+              color: "white",
+              fontSize: "0.875rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "all 0.2s ease"
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#059669";
+              e.target.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "#10B981";
+              e.target.style.transform = "translateY(0)";
+            }}
+          >
+            <i className="fas fa-file-excel"></i> Excel
+          </button>
+          <button
+            onClick={() => handleExport('pdf')}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.5rem 1rem",
+              border: "none",
+              borderRadius: "0.5rem",
+              backgroundColor: "#EF4444",
+              color: "white",
+              fontSize: "0.875rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "all 0.2s ease"
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#DC2626";
+              e.target.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "#EF4444";
+              e.target.style.transform = "translateY(0)";
+            }}
+          >
+            <i className="fas fa-file-pdf"></i> PDF
+          </button>
           <button
             onClick={() => {
               setEditMode(false)
