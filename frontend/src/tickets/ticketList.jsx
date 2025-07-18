@@ -79,6 +79,12 @@ const TicketList = () => {
   }
 
   const handleEditClick = (ticket) => {
+    const canEdit = user?.role === 'admin' || user?._id === ticket.createdBy;
+  
+    if (!canEdit) {
+      handleError("Vous n'avez pas les droits pour modifier ce ticket");
+      return;
+    }
     setEditingTicket(ticket)
     setEditMode(true)
     setShowModal(true)
@@ -582,6 +588,7 @@ const TicketList = () => {
         onError={handleError}
         editingTicket={editingTicket}
         editMode={editMode}
+        currentUserId={user?._id}
       />
 
       {/* PopUp */}

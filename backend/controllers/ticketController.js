@@ -133,3 +133,20 @@ exports.getTicketById = async (req, res) => {
     });
   }
 };
+
+
+// Dans votre ticketController.js
+exports.getTitres = async (req, res) => {
+  try {
+    const titres = await Ticket.distinct("titre")
+    res.status(200).json({
+      success: true,
+      data: titres
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}

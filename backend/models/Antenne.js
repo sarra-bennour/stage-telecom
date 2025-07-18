@@ -14,7 +14,8 @@ const antenneSchema = new mongoose.Schema({
   fournisseur: {type: String,enum: ['Kathrein', 'Jaybeam', 'Huawei', 'autres']},
   tilt: Number,
   azimut: Number,
-  station: {type: mongoose.Schema.Types.ObjectId, ref: 'Station',required: true}
+  station: {type: mongoose.Schema.Types.ObjectId, ref: 'Station',required: true},
+  createdBy: {type: mongoose.Schema.Types.ObjectId,ref: 'User',required: true}
 }, { timestamps: true });
 
 module.exports = mongoose.model('Antenne', antenneSchema);

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 
-const AddAntenne = ({ showModal, setShowModal, onAntenneAdded, onSuccess, onError, editingAntenne, editMode }) => {
+const AddAntenne = ({ showModal, setShowModal, onAntenneAdded, onSuccess, onError, editingAntenne, editMode, currentUserId }) => {
   const [formData, setFormData] = useState({
     type: "",
     nombre_antennes: "",
@@ -153,6 +153,12 @@ const AddAntenne = ({ showModal, setShowModal, onAntenneAdded, onSuccess, onErro
         tilt: formData.tilt ? Number(formData.tilt) : undefined,
         azimut: formData.azimut ? Number(formData.azimut) : undefined,
         dernier_controle: formData.dernier_controle || undefined,
+        createdBy: currentUserId
+      }
+
+      // Ajouter l'ID utilisateur si disponible
+      if (currentUserId) {
+        submitData.createdBy = currentUserId;
       }
 
       // Remove empty fields

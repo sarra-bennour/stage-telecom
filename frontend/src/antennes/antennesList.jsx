@@ -81,6 +81,13 @@ const AntennesList = () => {
   }
 
   const handleEditClick = (antenne) => {
+    const canEdit = user?.role === 'admin' || user?._id === antenne.createdBy;
+  
+    if (!canEdit) {
+      handleError("Vous n'avez pas les droits pour modifier cet antenne");
+      return;
+    }
+    
     setEditingAntenne(antenne)
     setEditMode(true)
     setShowModal(true)
@@ -749,6 +756,7 @@ const AntennesList = () => {
         onError={handleError}
         editingAntenne={editingAntenne}
         editMode={editMode}
+        currentUserId={user?._id}
       />
 
       {/* PopUp */}

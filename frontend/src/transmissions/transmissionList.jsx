@@ -80,6 +80,12 @@ const TransmissionList = () => {
   }
 
   const handleEditClick = (transmission) => {
+    const canEdit = user?.role === 'admin' || user?._id === transmission.createdBy;
+
+    if (!canEdit) {
+      handleError("Vous n'avez pas les droits pour modifier cette transmission");
+      return;
+    }
     setEditingTransmission(transmission)
     setEditMode(true)
     setShowModal(true)
@@ -732,6 +738,7 @@ const TransmissionList = () => {
         onError={handleError}
         editingTransmission={editingTransmission}
         editMode={editMode}
+        currentUserId={user?._id}
       />
 
       {/* PopUp */}

@@ -88,6 +88,13 @@ const StationList = () => {
   }
 
   const handleEditClick = (station) => {
+    const canEdit = user?.role === 'admin' || user?._id === station.createdBy;
+  
+    if (!canEdit) {
+      handleError("Vous n'avez pas les droits pour modifier cette station");
+      return;
+    }
+
     setEditingStation({
       ...station,
       images_secteurs: station.images_secteurs || []
@@ -1268,6 +1275,7 @@ const StationList = () => {
         onError={handleError}
         editingStation={editingStation}
         editMode={editMode}
+        currentUserId={user?._id}
       />
 
       {/* PopUp */}

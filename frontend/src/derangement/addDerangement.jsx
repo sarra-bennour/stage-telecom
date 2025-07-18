@@ -11,6 +11,7 @@ const AddDerangement = ({
   onError,
   editingDerangement,
   editMode,
+  currentUserId
 }) => {
   const [formData, setFormData] = useState({
     type: "",
@@ -131,6 +132,10 @@ const AddDerangement = ({
       const submitData = {
         ...formData,
         date_occurrence: formData.date_occurrence ? new Date(formData.date_occurrence).toISOString() : undefined,
+      }
+
+      if (currentUserId) {
+        submitData.createdBy = currentUserId;
       }
 
       // Remove empty fields
@@ -330,7 +335,7 @@ const AddDerangement = ({
                   <option value="">{loadingTickets ? "Chargement des tickets..." : "Sélectionner un ticket"}</option>
                   {tickets.map((ticket) => (
                     <option key={ticket._id} value={ticket._id}>
-                      #{ticket.numero || ticket._id.slice(-6)} - {ticket.titre || "Sans titre"}
+                      #{ticket.num_ticket || ticket._id.slice(-6)} - {ticket.titre || "Sans titre"}
                       {ticket.statut && ` (${ticket.statut})`}
                     </option>
                   ))}

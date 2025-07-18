@@ -19,7 +19,8 @@ const stationSchema = new mongoose.Schema({
   derniere_maintenance: Date,
   audits: [{type: mongoose.Schema.Types.ObjectId, ref: 'Audit'}],
   transmissions: [{type: mongoose.Schema.Types.ObjectId, ref: 'Transmission'}],
-  derangements: [{type: mongoose.Schema.Types.ObjectId, ref: 'Derangement'}]
+  derangements: [{type: mongoose.Schema.Types.ObjectId, ref: 'Derangement'}],
+  createdBy: {type: mongoose.Schema.Types.ObjectId,ref: 'User',required: true}
 }, { timestamps: true });
 
 

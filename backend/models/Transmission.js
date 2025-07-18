@@ -8,6 +8,7 @@ const transmissionSchema = new mongoose.Schema({
   observation: String,
   date_installation: Date,
   date_derniere_maintenance: Date,
+  createdBy: {type: mongoose.Schema.Types.ObjectId,ref: 'User',required: true}
 }, { timestamps: true });
 
 module.exports = mongoose.model('Transmission', transmissionSchema);

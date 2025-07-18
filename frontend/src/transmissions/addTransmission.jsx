@@ -11,6 +11,7 @@ const AddTransmission = ({
   onError,
   editingTransmission,
   editMode,
+  currentUserId
 }) => {
   const [formData, setFormData] = useState({
     type: "",
@@ -113,6 +114,11 @@ const AddTransmission = ({
         debit: formData.debit ? Number(formData.debit) : undefined,
         date_installation: formData.date_installation || undefined,
         date_derniere_maintenance: formData.date_derniere_maintenance || undefined,
+        createdBy: currentUserId
+      }
+
+      if (currentUserId) {
+        submitData.createdBy = currentUserId;
       }
 
       // Remove empty fields

@@ -73,6 +73,12 @@ const DerangementList = () => {
   }
 
   const handleEditClick = (derangement) => {
+    const canEdit = user?.role === 'admin' || user?._id === derangement.createdBy;
+  
+    if (!canEdit) {
+      handleError("Vous n'avez pas les droits pour modifier ce dérangement");
+      return;
+    }
     setEditingDerangement(derangement)
     setEditMode(true)
     setShowModal(true)
@@ -476,7 +482,8 @@ const DerangementList = () => {
                             <div className="derangement-history-item-footer">
                               <div className="derangement-history-item-ticket">
                                 <i className="fas fa-ticket-alt"></i>
-                                <span>Ticket: {derangement.ticket?.num_ticket ? `#${derangement.ticket.num_ticket}` : 'N/A'}</span>                              </div>
+                                <span>Ticket: {derangement.ticket?.num_ticket ?? 'N/A'}</span>
+                              </div>
                               <div className="derangement-history-item-created">
                                 <i className="fas fa-plus-circle"></i>
                                 <span>Créé le {formatDate(derangement.createdAt)}</span>
@@ -558,6 +565,7 @@ const DerangementList = () => {
         onError={handleError}
         editingDerangement={editingDerangement}
         editMode={editMode}
+        currentUserId={user?._id}
       />
     </div>
   )

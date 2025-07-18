@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 
-const AddUpdateStation = ({ showModal, setShowModal, onStationAdded, onSuccess, onError, editingStation, editMode }) => {
+const AddUpdateStation = ({ showModal, setShowModal, onStationAdded, onSuccess, onError, editingStation, editMode,currentUserId }) => {
   const [formData, setFormData] = useState({
     nom: "",
     position_x: "",
@@ -140,6 +140,10 @@ const AddUpdateStation = ({ showModal, setShowModal, onStationAdded, onSuccess, 
       }
 
       const formDataToSend = new FormData();
+
+      if (currentUserId) {
+      formDataToSend.append('createdBy', currentUserId);
+    }
       
       // Ajouter les données du formulaire
       Object.keys(formData).forEach(key => {

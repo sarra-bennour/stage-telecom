@@ -51,6 +51,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -731,6 +732,7 @@
     opacity: 0;
     transform: scale(0.9) translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -755,7 +757,7 @@
 
 .ticket-modal-icon {
   font-size: 1.5rem;
-  color:#4f46e5;
+  color: #4f46e5;
 }
 
 .ticket-modal-title {
@@ -780,7 +782,7 @@
 }
 
 .ticket-modal-close-btn:hover {
-  background:  rgba(102, 101, 101, 0.652);
+  background: rgba(102, 101, 101, 0.652);
 }
 
 /* Form Styles */
@@ -994,7 +996,7 @@
     grid-template-columns: 1fr;
   }
 
-  
+
 }
 
 @media (max-width: 480px) {
@@ -1249,11 +1251,13 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 /* Stats compactes sur une ligne */
 .ticket-crud-stats.compact {
   display: flex;
@@ -1331,4 +1335,49 @@
   .ticket-crud-stats.compact {
     grid-template-columns: 1fr;
   }
+}
+
+/* Styles pour le champ titre */
+.titre-input-container {
+  position: relative;
+}
+
+.titre-input-container input.ticket-form-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 40px;
+}
+
+.titre-dropdown-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  z-index: 2;
+  padding: 0 6px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.titre-input-container input.ticket-form-input:focus {
+  outline: none;
+  border-color: var(--ticket-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Pour éviter que le dropdown ne masque la bordure du champ */
+.anciens-titres-dropdown {
+  margin-top: 2px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.06);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 20;
 }

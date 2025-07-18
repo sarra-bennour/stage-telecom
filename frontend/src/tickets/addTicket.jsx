@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react"
 import "./ticket-crud.css"
 
-const AddTicket = ({ showModal, setShowModal, onTicketAdded, onSuccess, onError, editingTicket, editMode }) => {
+const AddTicket = ({ showModal, setShowModal, onTicketAdded, onSuccess, onError, editingTicket, editMode, currentUserId }) => {
   const [formData, setFormData] = useState({
+    titre: "",
     statut: "ouvert",
     description_resolution: "",
     superviseur_id: "",
@@ -12,6 +13,8 @@ const AddTicket = ({ showModal, setShowModal, onTicketAdded, onSuccess, onError,
     date_cloture: "",
   })
 
+  const [anciensTitres, setAnciensTitres] = useState([])
+  const [showAnciensTitres, setShowAnciensTitres] = useState(false)
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [users, setUsers] = useState([])
@@ -21,6 +24,7 @@ const AddTicket = ({ showModal, setShowModal, onTicketAdded, onSuccess, onError,
     if (showModal) {
       if (editMode && editingTicket) {
         setFormData({
+          titre: editingTicket.titre || "",
           statut: editingTicket.statut || "ouvert",
           description_resolution: editingTicket.description_resolution || "",
           superviseur_id: editingTicket.superviseur_id || "",
@@ -31,6 +35,7 @@ const AddTicket = ({ showModal, setShowModal, onTicketAdded, onSuccess, onError,
         })
       } else {
         setFormData({
+          titre: "",
           statut: "ouvert",
           description_resolution: "",
           superviseur_id: "",
@@ -40,8 +45,21 @@ const AddTicket = ({ showModal, setShowModal, onTicketAdded, onSuccess, onError,
       }
       setErrors({})
       fetchUsers()
+      fetchAnciensTitres()
     }
   }, [showModal, editMode, editingTicket])
+
+  const fetchAnciensTitres = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/tickets/titres")
+      if (response.ok) {
+        const data = await response.json()
+        setAnciensTitres(data.data || [])
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement des anciens titres:", error)
+    }
+  }
 
   const fetchUsers = async () => {
     try {
@@ -88,6 +106,10 @@ const AddTicket = ({ showModal, setShowModal, onTicketAdded, onSuccess, onError,
   const validateForm = () => {
     const newErrors = {}
 
+    if (!formData.titre.trim()) {
+      newErrors.titre = "Le titre est requis"
+    }
+
     if (!formData.description_resolution.trim()) {
       newErrors.description_resolution = "La description est requise"
     }
@@ -121,6 +143,10 @@ const AddTicket = ({ showModal, setShowModal, onTicketAdded, onSuccess, onError,
       const submitData = {
         ...formData,
         date_cloture: formData.date_cloture || null,
+      }
+
+      if (currentUserId) {
+        submitData.createdBy = currentUserId;
       }
 
       const url = editMode
@@ -187,6 +213,57 @@ const AddTicket = ({ showModal, setShowModal, onTicketAdded, onSuccess, onError,
 
         <form onSubmit={handleSubmit} className="ticket-modal-form">
           <div className="ticket-form-grid">
+            {/* Titre du ticket */}
+            <div className="ticket-form-group full-width">
+              <label className="ticket-form-label">
+                <i className="fas fa-heading"></i>
+                Titre du Ticket
+              </label>
+              <div className="titre-input-container">
+                <input
+                  type="text"
+                  name="titre"
+                  value={formData.titre}
+                  onChange={handleInputChange}
+                  className={`ticket-form-input ${errors.titre ? "error" : ""}`}
+                  placeholder="Entrez un titre ou sélectionnez parmi les anciens titres"
+                  onFocus={() => setShowAnciensTitres(true)}
+                  onBlur={() => setTimeout(() => setShowAnciensTitres(false), 150)}
+                  autoComplete="off"
+                />
+                <button
+                  type="button"
+                  className="titre-dropdown-btn"
+                  tabIndex={-1}
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => setShowAnciensTitres(!showAnciensTitres)}
+                >
+                  <i className={`fas fa-chevron-${showAnciensTitres ? "up" : "down"}`}></i>
+                </button>
+                {errors.titre && (
+                  <span className="ticket-form-error">
+                    <i className="fas fa-exclamation-triangle"></i>
+                    {errors.titre}
+                  </span>
+                )}
+                {showAnciensTitres && formData.titre && anciensTitres.filter(titre => titre.toLowerCase().includes(formData.titre.toLowerCase())).length > 0 && (
+                  <div className="anciens-titres-dropdown">
+                    {anciensTitres.filter(titre => titre.toLowerCase().includes(formData.titre.toLowerCase())).map((titre, index) => (
+                      <div
+                        key={index}
+                        className="ancien-titre-item"
+                        onMouseDown={() => {
+                          setFormData(prev => ({ ...prev, titre }))
+                          setShowAnciensTitres(false)
+                        }}
+                      >
+                        {titre}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
             {/* Status */}
             <div className="ticket-form-group full-width">
               <label className="ticket-form-label">
