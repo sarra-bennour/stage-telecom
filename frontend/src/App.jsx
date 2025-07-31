@@ -11,6 +11,7 @@ import TransmissionList from './transmissions/transmissionList';
 import DerangementList from './derangement/derangementList';
 import TicketList from './tickets/ticketList';
 import UserList from './user/userList';
+import PublicDashboard from "./user/publicDashboard";
 
 function App() {
   return (
@@ -25,7 +26,8 @@ function App() {
           {/* Accessible à tous les utilisateurs connectés */}
           <Route path='/dashboard' element={
             <ProtectedRoute>
-              <Dashboard />
+              {/* <Dashboard /> */}
+              <PublicDashboard/>
             </ProtectedRoute>
           } />
 
