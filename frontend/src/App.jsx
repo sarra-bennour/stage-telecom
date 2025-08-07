@@ -12,6 +12,7 @@ import DerangementList from './derangement/derangementList';
 import TicketList from './tickets/ticketList';
 import UserList from './user/userList';
 import PublicDashboard from "./user/publicDashboard";
+import Historique from "./historique/historique";
 
 function App() {
   return (
@@ -62,6 +63,11 @@ function App() {
           <Route path='/ticket-list' element={
             <ProtectedRoute>
               <TicketList />
+            </ProtectedRoute>
+          } />
+          <Route path='/history' element={
+            <ProtectedRoute>
+              <Historique />
             </ProtectedRoute>
           } />
         </Route>

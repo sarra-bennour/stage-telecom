@@ -113,6 +113,7 @@ const antenneRouter = require('./routes/antenneRoute');
 const transmissionRouter = require('./routes/transmissionRoute');
 const derangementRouter = require('./routes/derangementRoute');
 const ticketRouter = require('./routes/ticketRoute');
+const historiqueRouter = require('./routes/historiqueRoute');
 
 
 app.use('/users', usersRouter);
@@ -121,6 +122,7 @@ app.use('/antennes', antenneRouter);
 app.use('/transmissions', transmissionRouter);
 app.use('/derangements', derangementRouter);
 app.use('/tickets', ticketRouter);
+app.use('/historique', historiqueRouter);
 
 
 // Middleware de vérification d'authentification

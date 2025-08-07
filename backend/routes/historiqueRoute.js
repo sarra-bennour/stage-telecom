@@ -3,6 +3,6 @@ const router = express.Router();
 const historyController = require('../controllers/historiqueController');
 
 // Récupérer l'historique
-router.get('/', historyController.getHistory);
+router.post('/', historyController.getHistory);
 
 module.exports = router;
