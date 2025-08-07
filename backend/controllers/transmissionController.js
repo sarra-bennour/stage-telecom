@@ -1,10 +1,20 @@
 const Transmission = require('../models/Transmission');
+const History = require('../models/Historique');
+
 
 // Créer une nouvelle transmission
 exports.createTransmission = async (req, res) => {
   try {
     const transmission = new Transmission(req.body);
     await transmission.save();
+
+    // Enregistrement direct de l'historique
+      await History.create({
+        action: `Création de la transmission de type ${transmission.type} de fournisseur ${transmission.fournisseur}`,
+        entity: 'Transmission',
+        entityId: transmission._id,
+        user: transmission.createdBy
+      });
 
     res.status(201).json({
       success: true,
@@ -56,6 +66,14 @@ exports.updateTransmission = async (req, res) => {
       });
     }
 
+    // Enregistrement direct de l'historique
+      await History.create({
+        action: `Mise à jour de la transmission de type ${transmission.type} de fournisseur ${transmission.fournisseur}`,
+        entity: 'Transmission',
+        entityId: transmission._id,
+        user: transmission.createdBy
+      });
+
     res.status(200).json({
       success: true,
       message: 'Transmission mise à jour avec succès',
@@ -83,6 +101,13 @@ exports.deleteTransmission = async (req, res) => {
         message: 'Transmission non trouvée'
       });
     }
+    // Enregistrement direct de l'historique
+      await History.create({
+        action: `Supression de la transmission de type ${transmission.type} de fournisseur ${transmission.fournisseur}`,
+        entity: 'Transmission',
+        entityId: transmission._id,
+        user: transmission.createdBy
+      });
 
     res.status(200).json({
       success: true,

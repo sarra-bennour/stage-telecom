@@ -1,6 +1,8 @@
 const Station = require('../models/Station');
 const path = require('path');
 const fs = require('fs');
+const History = require('../models/Historique');
+
 
 // Contrôleur pour créer une nouvelle station
 exports.createStation = async (req, res) => {
@@ -28,6 +30,15 @@ exports.createStation = async (req, res) => {
 
     const newStation = new Station(stationData);
     await newStation.save();
+
+    // Enregistrement direct de l'historique
+      await History.create({
+        action: `Création de la station ${newStation.nom}`,
+        entity: 'Station',
+        entityId: newStation._id,
+        user: req.body.createdBy
+      });
+    
     
     res.status(201).json({
       success: true,
@@ -233,6 +244,14 @@ exports.updateStation = async (req, res) => {
       updateData,
       { new: true, runValidators: true }
     );
+
+    // Enregistrement direct de l'historique
+      await History.create({
+        action: `Mise à jour de la station ${updateData.nom}`,
+        entity: 'Station',
+        entityId: stationId,
+        user: updateData.createdBy
+      });
 
     res.status(200).json({
       success: true,

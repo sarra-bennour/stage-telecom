@@ -158,33 +158,6 @@ const Sidebar = () =>{
           <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Tickets</span>
         </NavLink>
       </li>
-      <li className="w-full mt-4">
-        <h6 className="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">Account pages</h6>
-      </li>
-      <li className="mt-0.5 w-full">
-        <a className=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors" href="./pages/profile.html">
-          <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-            <i className="relative top-0 text-sm leading-normal text-slate-700 ni ni-single-02" />
-          </div>
-          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Profile</span>
-        </a>
-      </li>
-      <li className="mt-0.5 w-full">
-        <a className=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors" href="./pages/sign-in.html">
-          <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-            <i className="relative top-0 text-sm leading-normal text-orange-500 ni ni-single-copy-04" />
-          </div>
-          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Sign In</span>
-        </a>
-      </li>
-      <li className="mt-0.5 w-full">
-        <a className=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors" href="./pages/sign-up.html">
-          <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-            <i className="relative top-0 text-sm leading-normal text-cyan-500 ni ni-collection" />
-          </div>
-          <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Sign Up</span>
-        </a>
-      </li>
     </ul>
   </div>
   <div className="mx-4">
@@ -199,9 +172,6 @@ const Sidebar = () =>{
         </div>
       </div>
     </div>
-    <a href="https://www.creative-tim.com/learning-lab/tailwind/html/quick-start/argon-dashboard/" target="_blank" className="inline-block w-full px-8 py-2 mb-4 text-xs font-bold leading-normal text-center text-white capitalize transition-all ease-in rounded-lg shadow-md bg-slate-700 bg-150 hover:shadow-xs hover:-translate-y-px">Documentation</a>
-    {/* pro btn  */}
-    <a className="inline-block w-full px-8 py-2 text-xs font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-blue-500 border-0 rounded-lg shadow-md select-none bg-150 bg-x-25 hover:shadow-xs hover:-translate-y-px" href="https://www.creative-tim.com/product/argon-dashboard-pro-tailwind?ref=sidebarfree" target="_blank">Upgrade to pro</a>
   </div>
 </aside>
 {/* end sidenav */}

@@ -1,10 +1,19 @@
 const Derangement = require('../models/Derangement');
+const History = require('../models/Historique');
 
 // Créer un nouveau dérangement
 exports.createDerangement = async (req, res) => {
   try {
     const derangement = new Derangement(req.body);
     await derangement.save();
+
+    // Enregistrement direct de l'historique
+          await History.create({
+            action: `Création du dérangement de type ${derangement.type} de ${derangement.description}`,
+            entity: 'Dérangement',
+            entityId: derangement._id,
+            user: derangement.createdBy
+          });
 
     res.status(201).json({
       success: true,
@@ -61,6 +70,14 @@ exports.updateDerangement = async (req, res) => {
       });
     }
 
+    // Enregistrement direct de l'historique
+          await History.create({
+            action: `Mise à jour du dérangement de type ${derangement.type} de fournisseur ${derangement.description}`,
+            entity: 'Dérangement',
+            entityId: derangement._id,
+            user: derangement.createdBy
+          });
+
     res.status(200).json({
       success: true,
       message: 'Dérangement mis à jour avec succès',
@@ -88,6 +105,14 @@ exports.deleteDerangement = async (req, res) => {
         message: 'Dérangement non trouvé'
       });
     }
+
+    // Enregistrement direct de l'historique
+          await History.create({
+            action: `Suppression du dérangement de type ${derangement.type} de fournisseur ${derangement.description}`,
+            entity: 'Dérangement',
+            entityId: derangement._id,
+            user: derangement.createdBy
+          });
 
     res.status(200).json({
       success: true,

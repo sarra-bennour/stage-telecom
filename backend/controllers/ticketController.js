@@ -1,10 +1,21 @@
 const Ticket = require('../models/Ticket');
+const History = require('../models/Historique');
+
 
 // Créer un nouveau ticket
 exports.createTicket = async (req, res) => {
   try {
     const ticket = new Ticket(req.body);
     await ticket.save();
+
+    // Enregistrement direct de l'historique
+          await History.create({
+            action: `Création du ticket ${ticket.titre}`,
+            entity: 'Ticket',
+            entityId: ticket._id,
+            user: ticket.createdBy
+          });
+    
 
     res.status(201).json({
       success: true,
@@ -56,6 +67,15 @@ exports.updateTicket = async (req, res) => {
       new: true
     });
 
+    // Enregistrement direct de l'historique
+          await History.create({
+            action: `Mise à jour du ticket ${ticket.titre}`,
+            entity: 'Ticket',
+            entityId: ticket._id,
+            user: ticket.createdBy
+          });
+
+
     if (!ticket) {
       return res.status(404).json({
         success: false,
@@ -90,6 +110,15 @@ exports.deleteTicket = async (req, res) => {
         message: 'Ticket non trouvé'
       });
     }
+
+    // Enregistrement direct de l'historique
+          await History.create({
+            action: `Supression du ticket ${ticket.titre}`,
+            entity: 'Ticket',
+            entityId: ticket._id,
+            user: ticket.createdBy
+          });
+
 
     res.status(200).json({
       success: true,
@@ -135,7 +164,6 @@ exports.getTicketById = async (req, res) => {
 };
 
 
-// Dans votre ticketController.js
 exports.getTitres = async (req, res) => {
   try {
     const titres = await Ticket.distinct("titre")

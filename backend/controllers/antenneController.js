@@ -1,5 +1,7 @@
 const Antenne = require('../models/Antenne');
 const Station = require('../models/Station');
+const History = require('../models/Historique');
+
 
 // Créer une nouvelle antenne
 exports.createAntenne = async (req, res) => {
@@ -21,6 +23,14 @@ exports.createAntenne = async (req, res) => {
     });
 
     const savedAntenne = await newAntenne.save();
+
+    // Enregistrement direct de l'historique
+      await History.create({
+        action: `Création de l'antenne de type ${savedAntenne.type} de fournisseur ${savedAntenne.fournisseur}`,
+        entity: 'Antenne',
+        entityId: savedAntenne._id,
+        user: savedAntenne.createdBy
+      });
     
     res.status(201).json({
       success: true,
@@ -77,6 +87,14 @@ exports.updateAntenne = async (req, res) => {
       { ...updateData, ...(station && { station }) },
       { new: true, runValidators: true }
     );
+
+    // Enregistrement direct de l'historique
+      await History.create({
+        action: `Mise à jour de l'antenne de type ${updatedAntenne.type} de fournisseur ${updatedAntenne.fournisseur}`,
+        entity: 'Antenne',
+        entityId: updatedAntenne._id,
+        user: updatedAntenne.createdBy
+      });
 
     if (!updatedAntenne) {
       return res.status(404).json({
